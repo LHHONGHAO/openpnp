@@ -473,7 +473,7 @@
 	<repositories>
 		<repository>
 			<id>openpnp</id>
-			<url>https://github.com/openpnp/openpnp-maven-repo/raw/develop</url>
+			<url>https://gitee.com/lhhonghao/openpnp-maven-repo/raw/develop</url>
 		</repository>
 	</repositories>
 </project>

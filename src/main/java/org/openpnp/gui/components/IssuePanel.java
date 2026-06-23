@@ -607,14 +607,9 @@ public class IssuePanel extends JPanel {
         subjectText.setText(issue.getSubject().getSubjectText());
         subjectText.setIcon(issue.getSubject().getSubjectIcon());
 
-        BeanProperty<Issue, String> issueBeanProperty_1 = BeanProperty.create("issue");
-        BeanProperty<JTextArea, String> jLabelBeanProperty = BeanProperty.create("text");
-        AutoBinding<Issue, String, JTextArea, String> autoBinding_1 = Bindings.createAutoBinding(UpdateStrategy.READ, issue, issueBeanProperty_1, issueText, jLabelBeanProperty);
-        autoBinding_1.bind();
-        //
-        BeanProperty<Issue, String> issueBeanProperty_2 = BeanProperty.create("solution");
-        AutoBinding<Issue, String, JTextArea, String> autoBinding_2 = Bindings.createAutoBinding(UpdateStrategy.READ, issue, issueBeanProperty_2, solutionText, jLabelBeanProperty);
-        autoBinding_2.bind();
+        // Use text mapping for issue and solution text
+        issueText.setText(org.openpnp.ClassTitleRegistry.getTextMapping(issue.getIssue()));
+        solutionText.setText(org.openpnp.ClassTitleRegistry.getTextMapping(issue.getSolution()));
 
         UiUtils.messageBoxOnExceptionLater(() -> {
             issue.activate();

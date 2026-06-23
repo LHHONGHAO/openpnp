@@ -39,6 +39,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.openpnp.ClassTitleRegistry;
 import org.openpnp.Translations;
 import org.openpnp.gui.MainFrame;
 import org.openpnp.gui.components.AutoSelectTextTable;
@@ -787,9 +788,9 @@ public class Solutions extends AbstractTableModel {
             case 1:
                 return issue.getSeverity();
             case 2:
-                return issue.getIssue();
+                return ClassTitleRegistry.getTextMapping(issue.getIssue());
             case 3:
-                return issue.getSolution();
+                return ClassTitleRegistry.getTextMapping(issue.getSolution());
             case 4:
                 return issue.getState();
             default:
@@ -800,9 +801,9 @@ public class Solutions extends AbstractTableModel {
         Issue issue = getIssue(rowIndex); 
         switch (columnIndex) {
             case 2:
-                return issue.getIssue();
+                return ClassTitleRegistry.getTextMapping(issue.getIssue());
             case 3:
-                return issue.getSolution();
+                return ClassTitleRegistry.getTextMapping(issue.getSolution());
         }
         return null;
     }

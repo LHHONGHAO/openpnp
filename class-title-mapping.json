@@ -1,0 +1,483 @@
+
+[
+  {
+    "id": "ID_001",
+    "className": "org.openpnp.machine.reference.ReferenceMachine",
+    "simpleName": "ReferenceMachine",
+    "translationKey": "ClassTitle.ID_001",
+    "englishTitle": "Machine",
+    "chineseTitle": "机器",
+    "appendName": false,
+    "category": "MACHINE"
+  },
+  {
+    "id": "ID_002",
+    "className": "org.openpnp.machine.reference.ReferenceHead",
+    "simpleName": "ReferenceHead",
+    "translationKey": "ClassTitle.ID_002",
+    "englishTitle": "Head",
+    "chineseTitle": "贴装头",
+    "appendName": true,
+    "category": "MACHINE"
+  },
+  {
+    "id": "ID_003",
+    "className": "org.openpnp.machine.reference.ReferenceNozzle",
+    "simpleName": "ReferenceNozzle",
+    "translationKey": "ClassTitle.ID_003",
+    "englishTitle": "Nozzle",
+    "chineseTitle": "吸嘴",
+    "appendName": true,
+    "category": "MACHINE"
+  },
+  {
+    "id": "ID_004",
+    "className": "org.openpnp.machine.reference.ReferenceNozzleTip",
+    "simpleName": "ReferenceNozzleTip",
+    "translationKey": "ClassTitle.ID_004",
+    "englishTitle": "Nozzle Tip",
+    "chineseTitle": "吸嘴尖",
+    "appendName": true,
+    "category": "MACHINE"
+  },
+  {
+    "id": "ID_005",
+    "className": "org.openpnp.machine.reference.ReferenceActuator",
+    "simpleName": "ReferenceActuator",
+    "translationKey": "ClassTitle.ID_005",
+    "englishTitle": "Actuator",
+    "chineseTitle": "执行器",
+    "appendName": true,
+    "category": "MACHINE"
+  },
+  {
+    "id": "ID_006",
+    "className": "org.openpnp.machine.reference.axis.ReferenceControllerAxis",
+    "simpleName": "ReferenceControllerAxis",
+    "translationKey": "ClassTitle.ID_006",
+    "englishTitle": "Controller Axis",
+    "chineseTitle": "控制器轴",
+    "appendName": true,
+    "category": "AXIS"
+  },
+  {
+    "id": "ID_007",
+    "className": "org.openpnp.machine.reference.axis.ReferenceVirtualAxis",
+    "simpleName": "ReferenceVirtualAxis",
+    "translationKey": "ClassTitle.ID_007",
+    "englishTitle": "Virtual Axis",
+    "chineseTitle": "虚拟轴",
+    "appendName": true,
+    "category": "AXIS"
+  },
+  {
+    "id": "ID_008",
+    "className": "org.openpnp.machine.reference.axis.ReferenceCamClockwiseAxis",
+    "simpleName": "ReferenceCamClockwiseAxis",
+    "translationKey": "ClassTitle.ID_008",
+    "englishTitle": "Cam Clockwise Axis",
+    "chineseTitle": "凸轮顺时针轴",
+    "appendName": true,
+    "category": "AXIS"
+  },
+  {
+    "id": "ID_009",
+    "className": "org.openpnp.machine.reference.axis.ReferenceCamCounterClockwiseAxis",
+    "simpleName": "ReferenceCamCounterClockwiseAxis",
+    "translationKey": "ClassTitle.ID_009",
+    "englishTitle": "Cam Counter-Clockwise Axis",
+    "chineseTitle": "凸轮逆时针轴",
+    "appendName": true,
+    "category": "AXIS"
+  },
+  {
+    "id": "ID_010",
+    "className": "org.openpnp.machine.reference.axis.ReferenceLinearTransformAxis",
+    "simpleName": "ReferenceLinearTransformAxis",
+    "translationKey": "ClassTitle.ID_010",
+    "englishTitle": "Linear Transform Axis",
+    "chineseTitle": "线性变换轴",
+    "appendName": true,
+    "category": "AXIS"
+  },
+  {
+    "id": "ID_011",
+    "className": "org.openpnp.machine.reference.axis.ReferenceMappedAxis",
+    "simpleName": "ReferenceMappedAxis",
+    "translationKey": "ClassTitle.ID_011",
+    "englishTitle": "Mapped Axis",
+    "chineseTitle": "映射轴",
+    "appendName": true,
+    "category": "AXIS"
+  },
+  {
+    "id": "ID_012",
+    "className": "org.openpnp.machine.reference.feeder.ReferenceStripFeeder",
+    "simpleName": "ReferenceStripFeeder",
+    "translationKey": "ClassTitle.ID_012",
+    "englishTitle": "Strip Feeder",
+    "chineseTitle": "条状送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_013",
+    "className": "org.openpnp.machine.reference.feeder.ReferenceTrayFeeder",
+    "simpleName": "ReferenceTrayFeeder",
+    "translationKey": "ClassTitle.ID_013",
+    "englishTitle": "Tray Feeder",
+    "chineseTitle": "托盘送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_014",
+    "className": "org.openpnp.machine.reference.feeder.ReferenceTubeFeeder",
+    "simpleName": "ReferenceTubeFeeder",
+    "translationKey": "ClassTitle.ID_014",
+    "englishTitle": "Tube Feeder",
+    "chineseTitle": "管状送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_015",
+    "className": "org.openpnp.machine.reference.feeder.ReferenceLoosePartFeeder",
+    "simpleName": "ReferenceLoosePartFeeder",
+    "translationKey": "ClassTitle.ID_015",
+    "englishTitle": "Loose Part Feeder",
+    "chineseTitle": "松散元件送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_016",
+    "className": "org.openpnp.machine.reference.feeder.ReferencePushPullFeeder",
+    "simpleName": "ReferencePushPullFeeder",
+    "translationKey": "ClassTitle.ID_016",
+    "englishTitle": "Push-Pull Feeder",
+    "chineseTitle": "推拉力送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_017",
+    "className": "org.openpnp.machine.reference.feeder.ReferenceRotatedTrayFeeder",
+    "simpleName": "ReferenceRotatedTrayFeeder",
+    "translationKey": "ClassTitle.ID_017",
+    "englishTitle": "Rotated Tray Feeder",
+    "chineseTitle": "旋转托盘送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_018",
+    "className": "org.openpnp.machine.reference.feeder.ReferenceDragFeeder",
+    "simpleName": "ReferenceDragFeeder",
+    "translationKey": "ClassTitle.ID_018",
+    "englishTitle": "Drag Feeder",
+    "chineseTitle": "拖拽送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_019",
+    "className": "org.openpnp.machine.reference.feeder.ReferenceHeapFeeder",
+    "simpleName": "ReferenceHeapFeeder",
+    "translationKey": "ClassTitle.ID_019",
+    "englishTitle": "Heap Feeder",
+    "chineseTitle": "堆积送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_020",
+    "className": "org.openpnp.machine.reference.feeder.ReferenceLeverFeeder",
+    "simpleName": "ReferenceLeverFeeder",
+    "translationKey": "ClassTitle.ID_020",
+    "englishTitle": "Lever Feeder",
+    "chineseTitle": "杠杆送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_021",
+    "className": "org.openpnp.machine.reference.feeder.ReferenceAutoFeeder",
+    "simpleName": "ReferenceAutoFeeder",
+    "translationKey": "ClassTitle.ID_021",
+    "englishTitle": "Auto Feeder",
+    "chineseTitle": "自动送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_022",
+    "className": "org.openpnp.machine.reference.feeder.AdvancedLoosePartFeeder",
+    "simpleName": "AdvancedLoosePartFeeder",
+    "translationKey": "ClassTitle.ID_022",
+    "englishTitle": "Advanced Loose Part Feeder",
+    "chineseTitle": "高级松散元件送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_023",
+    "className": "org.openpnp.machine.reference.feeder.BlindsFeeder",
+    "simpleName": "BlindsFeeder",
+    "translationKey": "ClassTitle.ID_023",
+    "englishTitle": "Blinds Feeder",
+    "chineseTitle": "百叶窗送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_024",
+    "className": "org.openpnp.machine.reference.feeder.SchultzFeeder",
+    "simpleName": "SchultzFeeder",
+    "translationKey": "ClassTitle.ID_024",
+    "englishTitle": "Schultz Feeder",
+    "chineseTitle": "舒尔茨送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_025",
+    "className": "org.openpnp.machine.rapidplacer.RapidFeeder",
+    "simpleName": "RapidFeeder",
+    "translationKey": "ClassTitle.ID_025",
+    "englishTitle": "Rapid Feeder",
+    "chineseTitle": "快速送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_026",
+    "className": "org.openpnp.machine.photon.PhotonFeeder",
+    "simpleName": "PhotonFeeder",
+    "translationKey": "ClassTitle.ID_026",
+    "englishTitle": "Photon Feeder",
+    "chineseTitle": "光子送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_027",
+    "className": "org.openpnp.machine.pandaplacer.BambooFeederAutoVision",
+    "simpleName": "BambooFeederAutoVision",
+    "translationKey": "ClassTitle.ID_027",
+    "englishTitle": "Bamboo Feeder Auto Vision",
+    "chineseTitle": "竹制送料器自动视觉",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_028",
+    "className": "org.openpnp.machine.neoden4.Neoden4Feeder",
+    "simpleName": "Neoden4Feeder",
+    "translationKey": "ClassTitle.ID_028",
+    "englishTitle": "Neoden4 Feeder",
+    "chineseTitle": "Neoden4送料器",
+    "appendName": true,
+    "category": "FEEDER"
+  },
+  {
+    "id": "ID_029",
+    "className": "org.openpnp.machine.reference.camera.OpenPnpCaptureCamera",
+    "simpleName": "OpenPnpCaptureCamera",
+    "translationKey": "ClassTitle.ID_029",
+    "englishTitle": "OpenPnP Capture Camera",
+    "chineseTitle": "OpenPnP采集相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_030",
+    "className": "org.openpnp.machine.reference.camera.MjpgCaptureCamera",
+    "simpleName": "MjpgCaptureCamera",
+    "translationKey": "ClassTitle.ID_030",
+    "englishTitle": "MJPG Capture Camera",
+    "chineseTitle": "MJPG采集相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_031",
+    "className": "org.openpnp.machine.reference.camera.OpenCvCamera",
+    "simpleName": "OpenCvCamera",
+    "translationKey": "ClassTitle.ID_031",
+    "englishTitle": "OpenCV Camera",
+    "chineseTitle": "OpenCV相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_032",
+    "className": "org.openpnp.machine.reference.camera.ImageCamera",
+    "simpleName": "ImageCamera",
+    "translationKey": "ClassTitle.ID_032",
+    "englishTitle": "Image Camera",
+    "chineseTitle": "图像相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_033",
+    "className": "org.openpnp.machine.reference.camera.BufferedImageCamera",
+    "simpleName": "BufferedImageCamera",
+    "translationKey": "ClassTitle.ID_033",
+    "englishTitle": "Buffered Image Camera",
+    "chineseTitle": "缓冲图像相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_034",
+    "className": "org.openpnp.machine.reference.camera.GstreamerCamera",
+    "simpleName": "GstreamerCamera",
+    "translationKey": "ClassTitle.ID_034",
+    "englishTitle": "GStreamer Camera",
+    "chineseTitle": "GStreamer相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_035",
+    "className": "org.openpnp.machine.reference.camera.Webcams",
+    "simpleName": "Webcams",
+    "translationKey": "ClassTitle.ID_035",
+    "englishTitle": "Webcams",
+    "chineseTitle": "网络摄像头",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_036",
+    "className": "org.openpnp.machine.reference.camera.SimulatedUpCamera",
+    "simpleName": "SimulatedUpCamera",
+    "translationKey": "ClassTitle.ID_036",
+    "englishTitle": "Simulated Up Camera",
+    "chineseTitle": "模拟顶部相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_037",
+    "className": "org.openpnp.machine.reference.camera.SwitcherCamera",
+    "simpleName": "SwitcherCamera",
+    "translationKey": "ClassTitle.ID_037",
+    "englishTitle": "Switcher Camera",
+    "chineseTitle": "切换相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_038",
+    "className": "org.openpnp.machine.reference.camera.OnvifIPCamera",
+    "simpleName": "OnvifIPCamera",
+    "translationKey": "ClassTitle.ID_038",
+    "englishTitle": "ONVIF IP Camera",
+    "chineseTitle": "ONVIF IP相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_039",
+    "className": "org.openpnp.machine.neoden4.Neoden4Camera",
+    "simpleName": "Neoden4Camera",
+    "translationKey": "ClassTitle.ID_039",
+    "englishTitle": "Neoden4 Camera",
+    "chineseTitle": "Neoden4相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_040",
+    "className": "org.openpnp.machine.neoden4.Neoden4SwitcherCamera",
+    "simpleName": "Neoden4SwitcherCamera",
+    "translationKey": "ClassTitle.ID_040",
+    "englishTitle": "Neoden4 Switcher Camera",
+    "chineseTitle": "Neoden4切换相机",
+    "appendName": true,
+    "category": "CAMERA"
+  },
+  {
+    "id": "ID_041",
+    "className": "org.openpnp.spi.base.AbstractDriver",
+    "simpleName": "AbstractDriver",
+    "translationKey": "ClassTitle.ID_041",
+    "englishTitle": "Driver",
+    "chineseTitle": "驱动",
+    "appendName": true,
+    "category": "DRIVER"
+  },
+  {
+    "id": "ID_042",
+    "className": "org.openpnp.machine.reference.driver.AbstractMotionPlanner",
+    "simpleName": "AbstractMotionPlanner",
+    "translationKey": "ClassTitle.ID_042",
+    "englishTitle": "Motion Planner",
+    "chineseTitle": "运动规划器",
+    "appendName": true,
+    "category": "DRIVER"
+  },
+  {
+    "id": "ID_043",
+    "className": "org.openpnp.machine.reference.vision.ReferenceFiducialLocator",
+    "simpleName": "ReferenceFiducialLocator",
+    "translationKey": "ClassTitle.ID_043",
+    "englishTitle": "Reference Fiducial Locator",
+    "chineseTitle": "基准点定位器",
+    "appendName": false,
+    "category": "VISION"
+  },
+  {
+    "id": "ID_044",
+    "className": "org.openpnp.machine.reference.vision.ReferenceBottomVision",
+    "simpleName": "ReferenceBottomVision",
+    "translationKey": "ClassTitle.ID_044",
+    "englishTitle": "Reference Bottom Vision",
+    "chineseTitle": "底部视觉",
+    "appendName": false,
+    "category": "VISION"
+  },
+  {
+    "id": "ID_045",
+    "className": "org.openpnp.spi.base.AbstractSignaler",
+    "simpleName": "AbstractSignaler",
+    "translationKey": "ClassTitle.ID_045",
+    "englishTitle": "Signaler",
+    "chineseTitle": "信号器",
+    "appendName": true,
+    "category": "SIGNALER"
+  },
+  {
+    "id": "ID_046",
+    "className": "org.openpnp.spi.base.SimplePropertySheetHolder",
+    "simpleName": "SimplePropertySheetHolder",
+    "translationKey": "ClassTitle.ID_046",
+    "englishTitle": "Property Sheet Holder",
+    "chineseTitle": "属性表持有者",
+    "appendName": false,
+    "category": "OTHER"
+  },
+  {
+    "id": "ID_047",
+    "className": "org.openpnp.spi.base.AbstractJobProcessor",
+    "simpleName": "AbstractJobProcessor",
+    "translationKey": "ClassTitle.ID_047",
+    "englishTitle": "Job Processor",
+    "chineseTitle": "作业处理器",
+    "appendName": false,
+    "category": "OTHER"
+  },
+  {
+    "id": "ID_048",
+    "className": "org.openpnp.spi.base.AbstractAxis",
+    "simpleName": "AbstractAxis",
+    "translationKey": "ClassTitle.ID_048",
+    "englishTitle": "Axis",
+    "chineseTitle": "轴",
+    "appendName": true,
+    "category": "AXIS"
+  }
+]

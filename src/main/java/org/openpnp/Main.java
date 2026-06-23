@@ -183,7 +183,11 @@ public class Main {
 
         Configuration.initialize(configurationDirectory);
         final Configuration configuration = Configuration.get();
-        Locale.setDefault(Configuration.get().getLocale());
+        Locale locale = Configuration.get().getLocale();
+        Locale.setDefault(locale);
+        // 确保 Translations 使用与 Configuration 相同的语言设置
+        String langCode = locale.getLanguage() + "_" + locale.getCountry();
+        Translations.setLanguage(langCode);
 
         ThemeInfo theme = configuration.getThemeInfo();
         new ThemeSettingsPanel().setTheme(theme, configuration.getFontSize(), configuration.isAlternateRows());

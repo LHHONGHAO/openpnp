@@ -549,6 +549,8 @@ public class MainFrame extends JFrame {
         mnHelp.add(changeLogAction);
         mnHelp.addSeparator();
         mnHelp.add(submitDiagnosticsAction);
+        mnHelp.addSeparator();
+        mnHelp.add(new JMenuItem(classTitleMappingEditorAction));
         if (isInstallerAvailable()) {
             mnHelp.add(new JMenuItem(checkForUpdatesAction));
         }
@@ -1072,6 +1074,14 @@ public class MainFrame extends JFrame {
         dialog.setModal(true);
         dialog.setVisible(true);
     }
+    
+    public void showClassTitleMappingEditor() {
+        ClassTitleMappingDialog dialog = new ClassTitleMappingDialog(this);
+        dialog.setSize(1200, 700);
+        dialog.setLocationRelativeTo(null);
+        dialog.setModal(true);
+        dialog.setVisible(true);
+    }
 
     public boolean saveConfig() {
         // Save the configuration
@@ -1312,6 +1322,17 @@ public class MainFrame extends JFrame {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             about();
+        }
+    };
+    
+    private Action classTitleMappingEditorAction = new AbstractAction(Translations.getString("Menu.Help.ClassTitleMappingEditor")) { //$NON-NLS-1$
+        {
+            putValue(MNEMONIC_KEY, KeyEvent.VK_E);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            showClassTitleMappingEditor();
         }
     };
     

@@ -11,6 +11,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -29,17 +30,17 @@ import org.openpnp.ClassTitleRegistry.TextMapping;
 import org.openpnp.Translations;
 
 public class ClassTitleMappingDialog extends JDialog {
-    
+
     private ClassMappingTableModel classTableModel;
     private JTable classTable;
     private JTextField classSearchTextField;
     private List<ClassMapping> allClassMappings;
-    
+
     private TextMappingTableModel textTableModel;
     private JTable textTable;
     private JTextField textSearchTextField;
     private List<TextMapping> allTextMappings;
-    
+
     private JComboBox<String> languageComboBox;
     private JCheckBox enableMappingCheckBox;
     private JTabbedPane tabbedPane;
@@ -49,7 +50,7 @@ public class ClassTitleMappingDialog extends JDialog {
     private JLabel searchLabel;
     private JLabel searchLabel2;
     private JLabel langLabel;
-    
+
     private static final String[] CLASS_COLUMN_KEYS = {
         "ClassTitleMappingDialog.column.id",
         "ClassTitleMappingDialog.column.simpleName",
@@ -58,32 +59,33 @@ public class ClassTitleMappingDialog extends JDialog {
         "ClassTitleMappingDialog.column.category",
         "ClassTitleMappingDialog.column.appendName"
     };
-    
+
     private static final String[] TEXT_COLUMN_KEYS = {
         "ClassTitleMappingDialog.column.id",
         "ClassTitleMappingDialog.column.originalText",
         "ClassTitleMappingDialog.column.englishTranslation",
         "ClassTitleMappingDialog.column.chineseTranslation"
     };
-    
+
     public ClassTitleMappingDialog(Frame frame) {
         super(frame, true);
         allClassMappings = ClassTitleRegistry.getAllMappings();
         allTextMappings = ClassTitleRegistry.getAllTextMappings();
         createUi();
+        loadColumnWidths();
         updateUiLanguage();
     }
-    
+
     private void createUi() {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setBounds(100, 100, 1200, 700);
         getContentPane().setLayout(new BorderLayout());
-        
+
         // Top panel with search, language, and enable toggle
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        
+
         // Enable mapping toggle
         enableMappingCheckBox = new JCheckBox();
         enableMappingCheckBox.setSelected(ClassTitleRegistry.isMappingEnabled());
@@ -91,13 +93,14 @@ public class ClassTitleMappingDialog extends JDialog {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 ClassTitleRegistry.setMappingEnabled(enableMappingCheckBox.isSelected());
+                refreshMainUi();
             }
         });
         topPanel.add(enableMappingCheckBox);
-        
+
         langLabel = new JLabel();
         topPanel.add(langLabel);
-        
+
         String[] languages = {"English", "Chinese (Simplified)"};
         languageComboBox = new JComboBox<>(languages);
         String currentLang = Translations.getLanguage();
@@ -107,15 +110,15 @@ public class ClassTitleMappingDialog extends JDialog {
             languageComboBox.setSelectedIndex(0);
         }
         topPanel.add(languageComboBox);
-        
+
         getContentPane().add(topPanel, BorderLayout.NORTH);
-        
+
         // Tabbed pane for class mapping and text mapping
         tabbedPane = new JTabbedPane();
-        
+
         // ==== Class Mapping Tab ====
         JPanel classPanel = new JPanel(new BorderLayout());
-        
+
         JPanel classSearchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchLabel = new JLabel();
         classSearchTextField = new JTextField(30);
@@ -128,17 +131,17 @@ public class ClassTitleMappingDialog extends JDialog {
         classSearchPanel.add(searchLabel);
         classSearchPanel.add(classSearchTextField);
         classPanel.add(classSearchPanel, BorderLayout.NORTH);
-        
+
         classTableModel = new ClassMappingTableModel(allClassMappings);
         classTable = new JTable(classTableModel);
         JScrollPane classScrollPane = new JScrollPane(classTable);
         classPanel.add(classScrollPane, BorderLayout.CENTER);
-        
+
         tabbedPane.addTab("", classPanel);
-        
+
         // ==== Text Mapping Tab ====
         JPanel textPanel = new JPanel(new BorderLayout());
-        
+
         JPanel textSearchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchLabel2 = new JLabel();
         textSearchTextField = new JTextField(30);
@@ -151,21 +154,21 @@ public class ClassTitleMappingDialog extends JDialog {
         textSearchPanel.add(searchLabel2);
         textSearchPanel.add(textSearchTextField);
         textPanel.add(textSearchPanel, BorderLayout.NORTH);
-        
+
         textTableModel = new TextMappingTableModel(allTextMappings);
         textTable = new JTable(textTableModel);
         JScrollPane textScrollPane = new JScrollPane(textTable);
         textPanel.add(textScrollPane, BorderLayout.CENTER);
-        
+
         tabbedPane.addTab("", textPanel);
-        
+
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
-        
+
         // Button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-        
+
         setLanguageButton = new JButton();
         setLanguageButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -176,43 +179,80 @@ public class ClassTitleMappingDialog extends JDialog {
                     Translations.setLanguage("en_US");
                 }
                 updateUiLanguage();
+                refreshMainUi();
             }
         });
         buttonPanel.add(setLanguageButton);
-        
+
         saveButton = new JButton();
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
+                saveColumnWidths();
                 ClassTitleRegistry.saveAll();
+                refreshMainUi();
             }
         });
         buttonPanel.add(saveButton);
-        
+
         okButton = new JButton();
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
+                saveColumnWidths();
                 ClassTitleRegistry.saveAll();
+                refreshMainUi();
                 setVisible(false);
             }
         });
         buttonPanel.add(okButton);
         getRootPane().setDefaultButton(okButton);
     }
-    
+
+    private void loadColumnWidths() {
+        Preferences prefs = Preferences.userNodeForPackage(ClassTitleMappingDialog.class);
+
+        for (int i = 0; i < classTable.getColumnCount(); i++) {
+            int width = prefs.getInt("classTable.colWidth." + i, -1);
+            if (width > 0) {
+                classTable.getColumnModel().getColumn(i).setPreferredWidth(width);
+            }
+        }
+
+        for (int i = 0; i < textTable.getColumnCount(); i++) {
+            int width = prefs.getInt("textTable.colWidth." + i, -1);
+            if (width > 0) {
+                textTable.getColumnModel().getColumn(i).setPreferredWidth(width);
+            }
+        }
+    }
+
+    private void saveColumnWidths() {
+        Preferences prefs = Preferences.userNodeForPackage(ClassTitleMappingDialog.class);
+
+        for (int i = 0; i < classTable.getColumnCount(); i++) {
+            int width = classTable.getColumnModel().getColumn(i).getWidth();
+            prefs.putInt("classTable.colWidth." + i, width);
+        }
+
+        for (int i = 0; i < textTable.getColumnCount(); i++) {
+            int width = textTable.getColumnModel().getColumn(i).getWidth();
+            prefs.putInt("textTable.colWidth." + i, width);
+        }
+    }
+
     private void updateUiLanguage() {
         setTitle(Translations.getString("ClassTitleMappingDialog.title"));
         enableMappingCheckBox.setText(Translations.getString("ClassTitleMappingDialog.enableMapping"));
         searchLabel.setText(Translations.getString("ClassTitleMappingDialog.search"));
         searchLabel2.setText(Translations.getString("ClassTitleMappingDialog.search"));
-        langLabel.setText("  " + Translations.getString("ClassTitleMappingDialog.language.english") + "/" 
+        langLabel.setText("  " + Translations.getString("ClassTitleMappingDialog.language.english") + "/"
                 + Translations.getString("ClassTitleMappingDialog.language.chinese") + ":  ");
         setLanguageButton.setText(Translations.getString("ClassTitleMappingDialog.setLanguage"));
         saveButton.setText(Translations.getString("ClassTitleMappingDialog.saveAll"));
         okButton.setText(Translations.getString("ClassTitleMappingDialog.ok"));
-        
+
         tabbedPane.setTitleAt(0, Translations.getString("ClassTitleMappingDialog.tab.classMapping"));
         tabbedPane.setTitleAt(1, Translations.getString("ClassTitleMappingDialog.tab.textMapping"));
-        
+
         // Refresh language combo selection
         String currentLang = Translations.getLanguage();
         if ("zh_CN".equals(currentLang)) {
@@ -220,16 +260,24 @@ public class ClassTitleMappingDialog extends JDialog {
         } else {
             languageComboBox.setSelectedIndex(0);
         }
-        
+
         // Refresh table headers
         classTableModel.fireTableStructureChanged();
         textTableModel.fireTableStructureChanged();
+        loadColumnWidths();
     }
-    
+
+    private void refreshMainUi() {
+        MainFrame mainFrame = MainFrame.get();
+        if (mainFrame != null && mainFrame.getMachineSetupTab() != null) {
+            mainFrame.getMachineSetupTab().refreshTree();
+        }
+    }
+
     private void filterClassTable() {
         String searchText = classSearchTextField.getText().toLowerCase();
         List<ClassMapping> filteredMappings = new ArrayList<>();
-        
+
         for (ClassMapping mapping : allClassMappings) {
             if (mapping.className.toLowerCase().contains(searchText) ||
                 mapping.simpleName.toLowerCase().contains(searchText) ||
@@ -240,14 +288,14 @@ public class ClassTitleMappingDialog extends JDialog {
                 filteredMappings.add(mapping);
             }
         }
-        
+
         classTableModel.setMappings(filteredMappings);
     }
-    
+
     private void filterTextTable() {
         String searchText = textSearchTextField.getText().toLowerCase();
         List<TextMapping> filteredMappings = new ArrayList<>();
-        
+
         for (TextMapping mapping : allTextMappings) {
             if (mapping.text.toLowerCase().contains(searchText) ||
                 mapping.englishTranslation.toLowerCase().contains(searchText) ||
@@ -256,23 +304,23 @@ public class ClassTitleMappingDialog extends JDialog {
                 filteredMappings.add(mapping);
             }
         }
-        
+
         textTableModel.setMappings(filteredMappings);
     }
-    
+
     // ====== Class Mapping Table Model ======
     public class ClassMappingTableModel extends AbstractTableModel {
         private List<ClassMapping> mappings;
-        
+
         public ClassMappingTableModel(List<ClassMapping> mappings) {
             this.mappings = new ArrayList<>(mappings);
         }
-        
+
         public void setMappings(List<ClassMapping> mappings) {
             this.mappings = new ArrayList<>(mappings);
             fireTableDataChanged();
         }
-        
+
         @Override
         public String getColumnName(int column) {
             if (column >= 0 && column < CLASS_COLUMN_KEYS.length) {
@@ -280,17 +328,17 @@ public class ClassTitleMappingDialog extends JDialog {
             }
             return "";
         }
-        
+
         @Override
         public int getColumnCount() {
             return CLASS_COLUMN_KEYS.length;
         }
-        
+
         @Override
         public int getRowCount() {
             return mappings.size();
         }
-        
+
         @Override
         public Class<?> getColumnClass(int columnIndex) {
             if (columnIndex == 5) {
@@ -298,12 +346,12 @@ public class ClassTitleMappingDialog extends JDialog {
             }
             return String.class;
         }
-        
+
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return false;
+            return columnIndex >= 2;
         }
-        
+
         @Override
         public Object getValueAt(int row, int column) {
             ClassMapping mapping = mappings.get(row);
@@ -317,25 +365,41 @@ public class ClassTitleMappingDialog extends JDialog {
                 default: return null;
             }
         }
-        
+
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            ClassMapping mapping = mappings.get(rowIndex);
+            switch (columnIndex) {
+                case 2:
+                    mapping.englishTitle = (String) aValue;
+                    break;
+                case 3:
+                    mapping.chineseTitle = (String) aValue;
+                    break;
+                case 4:
+                    mapping.category = (String) aValue;
+                    break;
+                case 5:
+                    mapping.appendName = (Boolean) aValue;
+                    break;
+            }
+            fireTableCellUpdated(rowIndex, columnIndex);
         }
     }
-    
+
     // ====== Text Mapping Table Model ======
     public class TextMappingTableModel extends AbstractTableModel {
         private List<TextMapping> mappings;
-        
+
         public TextMappingTableModel(List<TextMapping> mappings) {
             this.mappings = new ArrayList<>(mappings);
         }
-        
+
         public void setMappings(List<TextMapping> mappings) {
             this.mappings = new ArrayList<>(mappings);
             fireTableDataChanged();
         }
-        
+
         @Override
         public String getColumnName(int column) {
             if (column >= 0 && column < TEXT_COLUMN_KEYS.length) {
@@ -343,27 +407,27 @@ public class ClassTitleMappingDialog extends JDialog {
             }
             return "";
         }
-        
+
         @Override
         public int getColumnCount() {
             return TEXT_COLUMN_KEYS.length;
         }
-        
+
         @Override
         public int getRowCount() {
             return mappings.size();
         }
-        
+
         @Override
         public Class<?> getColumnClass(int columnIndex) {
             return String.class;
         }
-        
+
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return false;
+            return columnIndex >= 2;
         }
-        
+
         @Override
         public Object getValueAt(int row, int column) {
             TextMapping mapping = mappings.get(row);
@@ -375,9 +439,19 @@ public class ClassTitleMappingDialog extends JDialog {
                 default: return null;
             }
         }
-        
+
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            TextMapping mapping = mappings.get(rowIndex);
+            switch (columnIndex) {
+                case 2:
+                    mapping.englishTranslation = (String) aValue;
+                    break;
+                case 3:
+                    mapping.chineseTranslation = (String) aValue;
+                    break;
+            }
+            fireTableCellUpdated(rowIndex, columnIndex);
         }
     }
 }

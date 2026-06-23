@@ -181,15 +181,7 @@ public class Solutions extends AbstractTableModel {
         public default void findIssues(Solutions solutions) {
         }
         public default String getSubjectText() {
-            if (this instanceof Named) {
-                return (this.getClass().getSimpleName()+(((Named) this).getName() != null ? " "+((Named) this).getName() : ""));
-            }
-            else if (this instanceof Identifiable) {
-                return (this.getClass().getSimpleName()+" "+((Identifiable) this).getId());
-            }
-            else {
-                return (this.getClass().getSimpleName());
-            }
+            return org.openpnp.ClassTitleRegistry.getTitle(this);
         }
         public default Icon getSubjectIcon() {
             Icon icon = null;
@@ -804,6 +796,8 @@ public class Solutions extends AbstractTableModel {
                 return ClassTitleRegistry.getTextMapping(issue.getIssue());
             case 3:
                 return ClassTitleRegistry.getTextMapping(issue.getSolution());
+            case 0:
+                return ClassTitleRegistry.getTitle(issue.getSubject());
         }
         return null;
     }
@@ -813,8 +807,7 @@ public class Solutions extends AbstractTableModel {
             if (value == null) {
                 return;
             }
-            Subject subject = (Subject) value; 
-            setText(subject.getSubjectText());
+            setText(ClassTitleRegistry.getTitle(value));
         }
     }
 

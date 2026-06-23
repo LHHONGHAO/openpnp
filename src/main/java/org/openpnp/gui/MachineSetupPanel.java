@@ -58,6 +58,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.openpnp.ClassTitleRegistry;
 import org.openpnp.ConfigurationListener;
 import org.openpnp.Translations;
 import org.openpnp.gui.support.AbstractConfigurationWizard;
@@ -277,6 +278,15 @@ public class MachineSetupPanel extends JPanel implements WizardContainer {
         repaint();
     }
 
+    public void refreshTree() {
+        if (treeModel != null) {
+            treeModel.nodeChanged((TreeNode) treeModel.getRoot());
+        }
+        if (tree != null) {
+            tree.repaint();
+        }
+    }
+
     public class PropertySheetHolderTreeNode implements TreeNode {
         private final PropertySheetHolder obj;
         private final TreeNode parent;
@@ -376,6 +386,7 @@ public class MachineSetupPanel extends JPanel implements WizardContainer {
             if (value instanceof PropertySheetHolderTreeNode) {
                 PropertySheetHolderTreeNode node = (PropertySheetHolderTreeNode) value;
                 PropertySheetHolder psh = node.getPropertySheetHolder();
+                setText(ClassTitleRegistry.getTitleFromDisplayText(psh, node.toString()));
                 setIcon(psh.getPropertySheetHolderIcon());
             }
             return this;

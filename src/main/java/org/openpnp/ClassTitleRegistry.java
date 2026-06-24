@@ -19,79 +19,46 @@ import org.openpnp.model.Identifiable;
 import org.openpnp.model.Named;
 
 /**
- * Class/Text title mapping registry.
+ * Unified Class/Text title mapping registry.
  * 
- * <p>Mappings are loaded from classpath resource files (class-mappings.properties,
- * text-mappings.properties, text-mapping-patterns.properties) as defaults, then
- * overridden from user-local files in {@code ~/.openpnp/mappings/}. Changes made
- * through the UI are saved back to the user-local files, so they persist across
- * builds without recompilation.</p>
+ * <p>All mappings (class mappings, text mappings, and text mapping patterns) are stored
+ * in a unified structure for easier management and UI presentation. Mappings are loaded
+ * from classpath resource files (class-mappings.properties, text-mappings.properties,
+ * text-mapping-patterns.properties) as defaults, then overridden from user-local files
+ * in {@code ~/.openpnp/mappings/}. Changes made through the UI are saved back to the
+ * user-local files, so they persist across builds without recompilation.</p>
  */
 public class ClassTitleRegistry {
 
-    public static class ClassMapping {
+    public enum MappingType {
+        CLASS, TEXT, PATTERN
+    }
+
+    public static class Mapping {
         public final String id;
-        public final String className;
-        public final String simpleName;
-        public final String translationKey;
+        public final MappingType type;
+        public String source;
         public String englishTitle;
         public String chineseTitle;
-        public boolean appendName;
         public String category;
+        public boolean appendName;
+        public String className;
+        public String simpleName;
+        public String translationKey;
+        public java.util.regex.Pattern pattern;
 
-        public ClassMapping(String id, String className, String simpleName,
-                String translationKey, String englishTitle, String chineseTitle,
-                boolean appendName, String category) {
+        public Mapping(String id, MappingType type) {
             this.id = id;
-            this.className = className;
-            this.simpleName = simpleName;
-            this.translationKey = translationKey;
-            this.englishTitle = englishTitle;
-            this.chineseTitle = chineseTitle;
-            this.appendName = appendName;
-            this.category = category;
+            this.type = type;
         }
     }
 
-    public static class TextMapping {
-        public final String id;
-        public final String text;
-        public String englishTranslation;
-        public String chineseTranslation;
-
-        public TextMapping(String id, String text, String englishTranslation, String chineseTranslation) {
-            this.id = id;
-            this.text = text;
-            this.englishTranslation = englishTranslation;
-            this.chineseTranslation = chineseTranslation;
-        }
-    }
-
-    public static class TextMappingPattern {
-        public final String id;
-        public final java.util.regex.Pattern pattern;
-        public final String englishTemplate;
-        public final String chineseTemplate;
-
-        public TextMappingPattern(String id, String regex, String englishTemplate, String chineseTemplate) {
-            this.id = id;
-            this.pattern = java.util.regex.Pattern.compile(regex);
-            this.englishTemplate = englishTemplate;
-            this.chineseTemplate = chineseTemplate;
-        }
-    }
-
-    private static final List<ClassMapping> mappings = new ArrayList<>();
-    private static final Map<String, ClassMapping> mappingsByClassName = new HashMap<>();
-    private static final Map<String, ClassMapping> mappingsBySimpleName = new HashMap<>();
-    private static final Map<String, ClassMapping> mappingsById = new HashMap<>();
+    private static final List<Mapping> allMappings = new ArrayList<>();
+    private static final Map<String, Mapping> mappingsById = new HashMap<>();
+    private static final Map<String, Mapping> mappingsBySource = new HashMap<>();
+    private static final Map<String, Mapping> mappingsByClassName = new HashMap<>();
+    private static final Map<String, Mapping> mappingsBySimpleName = new HashMap<>();
     private static final Preferences prefs = Preferences.userNodeForPackage(ClassTitleRegistry.class);
-
-    private static final List<TextMapping> textMappings = new ArrayList<>();
-    private static final Map<String, TextMapping> textMappingsByText = new HashMap<>();
-    private static final Map<String, TextMapping> textMappingsById = new HashMap<>();
-
-    private static final List<TextMappingPattern> textMappingPatterns = new ArrayList<>();
 
     private static final String PREF_MAPPING_ENABLED = "mappingEnabled";
 
@@ -125,31 +92,22 @@ public class ClassTitleRegistry {
 
     /** Full reload from both classpath defaults and user override files. */
     private static void loadAll() {
-        mappings.clear();
+        allMappings.clear();
+        mappingsById.clear();
+        mappingsBySource.clear();
         mappingsByClassName.clear();
         mappingsBySimpleName.clear();
-        mappingsById.clear();
-        textMappings.clear();
-        textMappingsByText.clear();
-        textMappingsById.clear();
-        textMappingPatterns.clear();
 
-        // 1. Load classpath defaults
         loadClasspathDefaults();
-
-        // 2. Override with user-local files
         loadUserOverrides();
     }
 
     private static void loadClasspathDefaults() {
-        // Class mappings
         loadClassMappingsFromStream(
                 ClassTitleRegistry.class.getResourceAsStream(CLASS_MAPPINGS_RESOURCE),
                 false);
-        // Text mappings
         loadTextMappingsFromStream(
                 ClassTitleRegistry.class.getResourceAsStream(TEXT_MAPPINGS_RESOURCE));
-        // Text mapping patterns
         loadPatternsFromStream(
                 ClassTitleRegistry.class.getResourceAsStream(TEXT_PATTERNS_RESOURCE));
     }
@@ -158,7 +116,6 @@ public class ClassTitleRegistry {
         return new File(System.getProperty("user.home"), USER_MAPPINGS_DIR);
     }
 
-    /** Returns the user-override properties file for the given resource name. */
     private static File getUserOverrideFile(String resourceName) {
         return new File(getUserMappingsDir(), resourceName);
     }
@@ -166,7 +123,7 @@ public class ClassTitleRegistry {
     private static void loadUserOverrides() {
         File dir = getUserMappingsDir();
         if (!dir.isDirectory()) {
-            return; // no overrides yet
+            return;
         }
         File classFile = new File(dir, CLASS_MAPPINGS_RESOURCE);
         if (classFile.isFile()) {
@@ -194,11 +151,6 @@ public class ClassTitleRegistry {
         }
     }
 
-    /**
-     * Load class mappings from an input stream.
-     * <p>When {@code isOverride == true}, existing mappings with the same ID
-     * are replaced (update mode). Otherwise mappings are simply added.</p>
-     */
     private static void loadClassMappingsFromStream(java.io.InputStream is, boolean isOverride) {
         if (is == null) return;
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
@@ -206,7 +158,6 @@ public class ClassTitleRegistry {
             while ((line = br.readLine()) != null) {
                 line = line.trim();
                 if (line.isEmpty() || line.startsWith("#")) continue;
-                // Format: PID|className|simpleName|englishTitle|chineseTitle|appendName|category
                 String[] parts = line.split("\\|", 8);
                 if (parts.length < 7) continue;
                 String pid = "ID_" + parts[0];
@@ -218,8 +169,7 @@ public class ClassTitleRegistry {
                 String category = parts.length > 6 ? parts[6] : "";
 
                 if (isOverride) {
-                    // Replace existing mapping with same ID
-                    ClassMapping existing = mappingsById.get(pid);
+                    Mapping existing = mappingsById.get(pid);
                     if (existing != null) {
                         existing.englishTitle = englishTitle;
                         existing.chineseTitle = chineseTitle;
@@ -228,8 +178,15 @@ public class ClassTitleRegistry {
                         continue;
                     }
                 }
-                ClassMapping mapping = new ClassMapping(pid, className, simpleName,
-                        "ClassTitle." + pid, englishTitle, chineseTitle, appendName, category);
+                Mapping mapping = new Mapping(pid, MappingType.CLASS);
+                mapping.className = className;
+                mapping.simpleName = simpleName;
+                mapping.source = className;
+                mapping.englishTitle = englishTitle;
+                mapping.chineseTitle = chineseTitle;
+                mapping.appendName = appendName;
+                mapping.category = category;
+                mapping.translationKey = "ClassTitle." + pid;
                 addMapping(mapping);
             }
         } catch (Exception e) {
@@ -244,7 +201,6 @@ public class ClassTitleRegistry {
             while ((line = br.readLine()) != null) {
                 line = line.trim();
                 if (line.isEmpty() || line.startsWith("#")) continue;
-                // Format: PID|originalText|englishTranslation|chineseTranslation
                 String[] parts = line.split("\\|", 4);
                 if (parts.length < 4) continue;
                 String pid = "ID_" + parts[0];
@@ -252,8 +208,12 @@ public class ClassTitleRegistry {
                 String englishTranslation = parts[2];
                 String chineseTranslation = parts[3];
 
-                TextMapping mapping = new TextMapping(pid, originalText, englishTranslation, chineseTranslation);
-                addTextMapping(mapping);
+                Mapping mapping = new Mapping(pid, MappingType.TEXT);
+                mapping.source = originalText;
+                mapping.englishTitle = englishTranslation;
+                mapping.chineseTitle = chineseTranslation;
+                mapping.category = "Text";
+                addMapping(mapping);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -267,7 +227,6 @@ public class ClassTitleRegistry {
             while ((line = br.readLine()) != null) {
                 line = line.trim();
                 if (line.isEmpty() || line.startsWith("#")) continue;
-                // Format: PID|regex|englishTemplate|chineseTemplate
                 String[] parts = line.split("\\|", 4);
                 if (parts.length < 4) continue;
                 String pid = "ID_" + parts[0];
@@ -275,7 +234,13 @@ public class ClassTitleRegistry {
                 String englishTemplate = parts[2];
                 String chineseTemplate = parts[3];
 
-                addTextMappingPattern(new TextMappingPattern(pid, regex, englishTemplate, chineseTemplate));
+                Mapping mapping = new Mapping(pid, MappingType.PATTERN);
+                mapping.source = regex;
+                mapping.englishTitle = englishTemplate;
+                mapping.chineseTitle = chineseTemplate;
+                mapping.category = "Pattern";
+                mapping.pattern = java.util.regex.Pattern.compile(regex);
+                addMapping(mapping);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -306,11 +271,13 @@ public class ClassTitleRegistry {
                 new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
             bw.write("# Class Mappings (user overrides)\n");
             bw.write("# Format: PID|className|simpleName|englishTitle|chineseTitle|appendName|category\n");
-            for (ClassMapping m : mappings) {
-                String pid = m.id.startsWith("ID_") ? m.id.substring(3) : m.id;
-                bw.write(String.format("%s|%s|%s|%s|%s|%s|%s\n",
-                        pid, m.className, m.simpleName,
-                        m.englishTitle, m.chineseTitle, m.appendName, m.category));
+            for (Mapping m : allMappings) {
+                if (m.type == MappingType.CLASS) {
+                    String pid = m.id.startsWith("ID_") ? m.id.substring(3) : m.id;
+                    bw.write(String.format("%s|%s|%s|%s|%s|%s|%s\n",
+                            pid, m.className, m.simpleName,
+                            m.englishTitle, m.chineseTitle, m.appendName, m.category));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -323,10 +290,12 @@ public class ClassTitleRegistry {
                 new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
             bw.write("# Text Mappings (user overrides)\n");
             bw.write("# Format: PID|originalText|englishTranslation|chineseTranslation\n");
-            for (TextMapping m : textMappings) {
-                String pid = m.id.startsWith("ID_") ? m.id.substring(3) : m.id;
-                bw.write(String.format("%s|%s|%s|%s\n",
-                        pid, m.text, m.englishTranslation, m.chineseTranslation));
+            for (Mapping m : allMappings) {
+                if (m.type == MappingType.TEXT) {
+                    String pid = m.id.startsWith("ID_") ? m.id.substring(3) : m.id;
+                    bw.write(String.format("%s|%s|%s|%s\n",
+                            pid, m.source, m.englishTitle, m.chineseTitle));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -339,10 +308,12 @@ public class ClassTitleRegistry {
                 new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
             bw.write("# Text Mapping Patterns (user overrides)\n");
             bw.write("# Format: PID|regex|englishTemplate|chineseTemplate\n");
-            for (TextMappingPattern p : textMappingPatterns) {
-                String pid = p.id.startsWith("ID_") ? p.id.substring(3) : p.id;
-                bw.write(String.format("%s|%s|%s|%s\n",
-                        pid, p.pattern.pattern(), p.englishTemplate, p.chineseTemplate));
+            for (Mapping m : allMappings) {
+                if (m.type == MappingType.PATTERN) {
+                    String pid = m.id.startsWith("ID_") ? m.id.substring(3) : m.id;
+                    bw.write(String.format("%s|%s|%s|%s\n",
+                            pid, m.source, m.englishTitle, m.chineseTitle));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -353,57 +324,38 @@ public class ClassTitleRegistry {
     // Internal add helpers
     // -----------------------------------------------------------
 
-    private static void addMapping(ClassMapping mapping) {
-        mappings.add(mapping);
-        mappingsByClassName.put(mapping.className, mapping);
-        mappingsBySimpleName.put(mapping.simpleName, mapping);
+    private static void addMapping(Mapping mapping) {
+        allMappings.add(mapping);
         mappingsById.put(mapping.id, mapping);
-    }
-
-    private static void addTextMapping(TextMapping mapping) {
-        textMappings.add(mapping);
-        textMappingsByText.put(mapping.text, mapping);
-        textMappingsById.put(mapping.id, mapping);
-    }
-
-    private static void addTextMappingPattern(TextMappingPattern pattern) {
-        textMappingPatterns.add(pattern);
+        mappingsBySource.put(mapping.source, mapping);
+        if (mapping.type == MappingType.CLASS) {
+            mappingsByClassName.put(mapping.className, mapping);
+            mappingsBySimpleName.put(mapping.simpleName, mapping);
+        }
     }
 
     // -----------------------------------------------------------
     // Public query API
     // -----------------------------------------------------------
 
-    public static List<ClassMapping> getAllMappings() {
-        return new ArrayList<>(mappings);
+    public static List<Mapping> getAllMappings() {
+        return new ArrayList<>(allMappings);
     }
 
-    public static List<TextMapping> getAllTextMappings() {
-        return new ArrayList<>(textMappings);
-    }
-
-    public static List<TextMappingPattern> getAllTextMappingPatterns() {
-        return new ArrayList<>(textMappingPatterns);
-    }
-
-    public static ClassMapping getMapping(Class<?> clazz) {
-        ClassMapping mapping = mappingsByClassName.get(clazz.getName());
+    public static Mapping getMapping(Class<?> clazz) {
+        Mapping mapping = mappingsByClassName.get(clazz.getName());
         if (mapping == null) {
             mapping = mappingsBySimpleName.get(clazz.getSimpleName());
         }
         return mapping;
     }
 
-    public static ClassMapping getMappingById(String id) {
+    public static Mapping getMappingById(String id) {
         return mappingsById.get(id);
     }
 
-    public static TextMapping getTextMappingById(String id) {
-        return textMappingsById.get(id);
-    }
-
-    private static TextMapping getTextMappingByText(String text) {
-        return textMappingsByText.get(text);
+    private static Mapping getTextMappingByText(String text) {
+        return mappingsBySource.get(text);
     }
 
     /**
@@ -416,7 +368,7 @@ public class ClassTitleRegistry {
         if (!isMappingEnabled()) {
             return getDefaultTitle(obj);
         }
-        ClassMapping mapping = getMapping(obj.getClass());
+        Mapping mapping = getMapping(obj.getClass());
         if (mapping == null) {
             return getDefaultTitle(obj);
         }
@@ -462,30 +414,25 @@ public class ClassTitleRegistry {
         if (!isMappingEnabled()) {
             return text;
         }
-        // 1. Try exact text match first
-        TextMapping mapping = getTextMappingByText(text);
+        Mapping mapping = getTextMappingByText(text);
         if (mapping != null) {
             String currentLanguage = Translations.getLanguage();
-            String translatedText;
-            if ("zh_CN".equals(currentLanguage)) {
-                translatedText = mapping.chineseTranslation;
-            } else {
-                translatedText = mapping.englishTranslation;
-            }
+            String translatedText = "zh_CN".equals(currentLanguage) ? mapping.chineseTitle : mapping.englishTitle;
             return "(PID:" + mapping.id.substring(3) + ") " + translatedText;
         }
-        // 2. Try pattern matching for dynamic texts
-        for (TextMappingPattern patternMapping : textMappingPatterns) {
-            java.util.regex.Matcher matcher = patternMapping.pattern.matcher(text);
-            if (matcher.matches()) {
-                String currentLanguage = Translations.getLanguage();
-                String template = "zh_CN".equals(currentLanguage) ? patternMapping.chineseTemplate : patternMapping.englishTemplate;
-                String result = template;
-                for (int i = 0; i < matcher.groupCount(); i++) {
-                    String varPart = matcher.group(i + 1);
-                    result = result.replace("{" + i + "}", varPart);
+        for (Mapping patternMapping : allMappings) {
+            if (patternMapping.type == MappingType.PATTERN && patternMapping.pattern != null) {
+                java.util.regex.Matcher matcher = patternMapping.pattern.matcher(text);
+                if (matcher.matches()) {
+                    String currentLanguage = Translations.getLanguage();
+                    String template = "zh_CN".equals(currentLanguage) ? patternMapping.chineseTitle : patternMapping.englishTitle;
+                    String result = template;
+                    for (int i = 0; i < matcher.groupCount(); i++) {
+                        String varPart = matcher.group(i + 1);
+                        result = result.replace("{" + i + "}", varPart);
+                    }
+                    return "(PID:" + patternMapping.id.substring(3) + ") " + result;
                 }
-                return "(PID:" + patternMapping.id.substring(3) + ") " + result;
             }
         }
         return text;
@@ -500,14 +447,14 @@ public class ClassTitleRegistry {
             return displayText;
         }
         if (obj != null) {
-            ClassMapping mapping = getMapping(obj.getClass());
+            Mapping mapping = getMapping(obj.getClass());
             if (mapping != null) {
                 return buildTitle(mapping, getDisplaySuffix(displayText, mapping.simpleName));
             }
         }
         int separator = displayText.indexOf(' ');
         String simpleName = separator >= 0 ? displayText.substring(0, separator) : displayText;
-        ClassMapping mapping = mappingsBySimpleName.get(simpleName);
+        Mapping mapping = mappingsBySimpleName.get(simpleName);
         if (mapping == null) {
             return displayText;
         }
@@ -524,7 +471,7 @@ public class ClassTitleRegistry {
         return "";
     }
 
-    private static String buildTitle(ClassMapping mapping, String suffix) {
+    private static String buildTitle(Mapping mapping, String suffix) {
         String currentLanguage = Translations.getLanguage();
         String title = "zh_CN".equals(currentLanguage) ? mapping.chineseTitle : mapping.englishTitle;
         return "(PID:" + mapping.id.substring(3) + ") " + title + suffix;

@@ -642,9 +642,12 @@ public class Configuration extends AbstractModelObject {
             if (System.getProperty("backups") != null) {
                 backupsDirectory = new File(System.getProperty("backups"));
             }
+            backupsDirectory.mkdirs();
 
             File singleBackupDirectory = new File(backupsDirectory, DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss").format(now));
-            singleBackupDirectory.mkdirs();
+            if (!singleBackupDirectory.exists() && !singleBackupDirectory.mkdirs()) {
+                Logger.warn("Failed to create backup directory: " + singleBackupDirectory.getAbsolutePath());
+            }
             File backupFile = new File(singleBackupDirectory, fileName);
             Files.copy(Paths.get(file.toURI()), Paths.get(backupFile.toURI()), 
                     StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);

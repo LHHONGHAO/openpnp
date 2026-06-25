@@ -105,6 +105,12 @@ public class ClassTitleMappingDialog extends JDialog {
             public void keyReleased(KeyEvent e) {
                 filterTable();
             }
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    e.consume();
+                }
+            }
         });
         searchPanel.add(searchLabel);
         searchPanel.add(searchTextField);

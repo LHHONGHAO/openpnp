@@ -433,6 +433,34 @@
 				</configuration>
 			</plugin>
 
+			<!-- Creates an executable uber/fat jar with all dependencies -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.4</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>org.openpnp.Main</Main-Class>
+										<X-Compile-Source-JDK>1.8</X-Compile-Source-JDK>
+										<X-Compile-Target-JDK>1.8</X-Compile-Target-JDK>
+									</manifestEntries>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+							</transformers>
+							<outputFile>target/${project.artifactId}-${project.version}-exec.jar</outputFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 		<pluginManagement>
 			<plugins>

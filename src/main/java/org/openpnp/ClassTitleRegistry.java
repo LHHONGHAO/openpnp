@@ -446,19 +446,16 @@ public class ClassTitleRegistry {
         if (displayText == null || displayText.isEmpty() || !isMappingEnabled()) {
             return displayText;
         }
+        // For objects that are not mapped classes, return the original text
+        // This handles SimplePropertySheetHolder and other non-mapped objects
         if (obj != null) {
             Mapping mapping = getMapping(obj.getClass());
             if (mapping != null) {
                 return buildTitle(mapping, getDisplaySuffix(displayText, mapping.simpleName));
             }
         }
-        int separator = displayText.indexOf(' ');
-        String simpleName = separator >= 0 ? displayText.substring(0, separator) : displayText;
-        Mapping mapping = mappingsBySimpleName.get(simpleName);
-        if (mapping == null) {
-            return displayText;
-        }
-        return buildTitle(mapping, separator >= 0 ? displayText.substring(separator) : "");
+        // Return original text for non-mapped objects
+        return displayText;
     }
 
     private static String getDisplaySuffix(String displayText, String simpleName) {

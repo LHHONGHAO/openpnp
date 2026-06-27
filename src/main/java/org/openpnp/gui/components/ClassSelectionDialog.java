@@ -20,6 +20,8 @@
 package org.openpnp.gui.components;
 
 import org.openpnp.Translations;
+import org.openpnp.ClassTitleRegistry;
+import org.openpnp.ClassTitleRegistry.Mapping;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -150,6 +152,13 @@ public class ClassSelectionDialog<T> extends JDialog {
 
         @Override
         public String toString() {
+            if (ClassTitleRegistry.isMappingEnabled()) {
+                Mapping mapping = ClassTitleRegistry.getMapping(clz);
+                if (mapping != null) {
+                    String currentLanguage = Translations.getLanguage();
+                    return "zh_CN".equals(currentLanguage) ? mapping.chineseTitle : mapping.englishTitle;
+                }
+            }
             return clz.getSimpleName();
         }
 

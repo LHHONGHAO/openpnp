@@ -59,6 +59,7 @@ import org.openpnp.gui.support.MutableLocationProxy;
 import org.openpnp.gui.support.PercentConverter;
 import org.openpnp.machine.reference.feeder.ReferenceDragFeeder;
 import org.openpnp.model.Configuration;
+import org.openpnp.Translations;
 import org.openpnp.spi.Camera;
 import org.openpnp.util.UiUtils;
 
@@ -124,7 +125,7 @@ public class ReferenceDragFeederConfigurationWizard
         panelFields.setLayout(new BoxLayout(panelFields, BoxLayout.Y_AXIS));
 
         panelGeneral = new JPanel();
-        panelGeneral.setBorder(new TitledBorder(null, "General Settings", TitledBorder.LEADING,
+        panelGeneral.setBorder(new TitledBorder(null, Translations.getString("ReferenceDragFeederConfigurationWizard.GeneralBorder.title"), TitledBorder.LEADING, //$NON-NLS-1$
                 TitledBorder.TOP, null, null));
 
         panelFields.add(panelGeneral);
@@ -137,28 +138,28 @@ public class ReferenceDragFeederConfigurationWizard
                         FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
                         FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,}));
 
-        lblPartPitch = new JLabel("Part Pitch");
+        lblPartPitch = new JLabel(Translations.getString("CommonWords.PartPitch")); //$NON-NLS-1$
         panelGeneral.add(lblPartPitch, "2, 2, right, default");
 
         textFieldPartPitch = new JTextField();
         panelGeneral.add(textFieldPartPitch, "4, 2");
         textFieldPartPitch.setColumns(5);
 
-        lblFeedRate = new JLabel("Feed Speed %");
+        lblFeedRate = new JLabel(Translations.getString("CommonWords.FeedSpeed")); //$NON-NLS-1$
         panelGeneral.add(lblFeedRate, "2, 4");
 
         textFieldFeedRate = new JTextField();
         panelGeneral.add(textFieldFeedRate, "4, 4");
         textFieldFeedRate.setColumns(5);
 
-        lblActuatorId = new JLabel("Actuator Name");
+        lblActuatorId = new JLabel(Translations.getString("CommonWords.ActuatorName")); //$NON-NLS-1$
         panelGeneral.add(lblActuatorId, "2, 6, right, default");
 
         textFieldActuatorId = new JTextField();
         panelGeneral.add(textFieldActuatorId, "4, 6");
         textFieldActuatorId.setColumns(5);
 
-        lblPeelOffActuatorId = new JLabel("Peel Off Actuator Name");
+        lblPeelOffActuatorId = new JLabel(Translations.getString("CommonWords.PeelOffActuatorName")); //$NON-NLS-1$
         panelGeneral.add(lblPeelOffActuatorId, "6, 6, right, default");
 
         textFieldPeelOffActuatorId = new JTextField();
@@ -166,13 +167,13 @@ public class ReferenceDragFeederConfigurationWizard
         textFieldPeelOffActuatorId.setColumns(5);
 
         if (feeder.isPart0402()) {
-	        lbl0402PartDetected = new JLabel("0402 Part DETECTED");
+	        lbl0402PartDetected = new JLabel(Translations.getString("ReferenceDragFeederConfigurationWizard.0402PartDetectedLabel.text")); //$NON-NLS-1$
 	        panelGeneral.add(lbl0402PartDetected, "6, 2");
         }
 
         panelLocations = new JPanel();
         panelFields.add(panelLocations);
-        panelLocations.setBorder(new TitledBorder(null, "Locations", TitledBorder.LEADING,
+        panelLocations.setBorder(new TitledBorder(null, Translations.getString("ReferenceDragFeederConfigurationWizard.LocationsBorder.title"), TitledBorder.LEADING, //$NON-NLS-1$
                 TitledBorder.TOP, null, null));
         panelLocations.setLayout(new FormLayout(new ColumnSpec[] {
                 FormSpecs.RELATED_GAP_COLSPEC,
@@ -197,16 +198,16 @@ public class ReferenceDragFeederConfigurationWizard
                 FormSpecs.RELATED_GAP_ROWSPEC,
                 FormSpecs.DEFAULT_ROWSPEC,}));
 
-        JLabel lblX = new JLabel("X");
+        JLabel lblX = new JLabel(Translations.getString("CommonWords.X")); //$NON-NLS-1$
         panelLocations.add(lblX, "4, 4");
 
-        JLabel lblY = new JLabel("Y");
+        JLabel lblY = new JLabel(Translations.getString("CommonWords.Y")); //$NON-NLS-1$
         panelLocations.add(lblY, "6, 4");
 
-        JLabel lblZ = new JLabel("Z");
+        JLabel lblZ = new JLabel(Translations.getString("CommonWords.Z")); //$NON-NLS-1$
         panelLocations.add(lblZ, "8, 4");
 
-        JLabel lblFeedStartLocation = new JLabel("Feed Start Location");
+        JLabel lblFeedStartLocation = new JLabel(Translations.getString("CommonWords.FeedStartLocation")); //$NON-NLS-1$
         panelLocations.add(lblFeedStartLocation, "2, 6, right, default");
 
         textFieldFeedStartX = new JTextField();
@@ -225,7 +226,7 @@ public class ReferenceDragFeederConfigurationWizard
                 textFieldFeedStartY, textFieldFeedStartZ, null);
         panelLocations.add(locationButtonsPanelFeedStart, "10, 6");
 
-        JLabel lblFeedEndLocation = new JLabel("Feed End Location");
+        JLabel lblFeedEndLocation = new JLabel(Translations.getString("CommonWords.FeedEndLocation")); //$NON-NLS-1$
         panelLocations.add(lblFeedEndLocation, "2, 8, right, default");
 
         textFieldFeedEndX = new JTextField();
@@ -244,7 +245,7 @@ public class ReferenceDragFeederConfigurationWizard
                 textFieldFeedEndZ, null);
         panelLocations.add(locationButtonsPanelFeedEnd, "10, 8");
         
-        lblBackoffDistance = new JLabel("Backoff Distance");
+        lblBackoffDistance = new JLabel(Translations.getString("CommonWords.BackoffDistance")); //$NON-NLS-1$
         panelLocations.add(lblBackoffDistance, "2, 10, right, default");
         
         backoffDistTf = new JTextField();
@@ -252,7 +253,7 @@ public class ReferenceDragFeederConfigurationWizard
         backoffDistTf.setColumns(10);
         //
         panelVision = new JPanel();
-        panelVision.setBorder(new TitledBorder(null, "Vision", TitledBorder.LEADING,
+        panelVision.setBorder(new TitledBorder(null, Translations.getString("ReferenceDragFeederConfigurationWizard.VisionBorder.title"), TitledBorder.LEADING, //$NON-NLS-1$
                 TitledBorder.TOP, null, null));
         panelFields.add(panelVision);
         panelVision.setLayout(new BoxLayout(panelVision, BoxLayout.Y_AXIS));
@@ -277,7 +278,7 @@ public class ReferenceDragFeederConfigurationWizard
 
         panelTemplate = new JPanel();
         panelTemplate.setBorder(new TitledBorder(null,
-                "Template Image", TitledBorder.LEADING, TitledBorder.TOP, null));
+                Translations.getString("ReferenceDragFeederConfigurationWizard.TemplateImageBorder.title"), TitledBorder.LEADING, TitledBorder.TOP, null)); //$NON-NLS-1$
         panelVisionTemplateAndAoe.add(panelTemplate, "2, 2, center, fill");
         panelTemplate.setLayout(new BoxLayout(panelTemplate, BoxLayout.Y_AXIS));
 
@@ -302,7 +303,7 @@ public class ReferenceDragFeederConfigurationWizard
         panel.add(btnCancelChangeTemplateImage);
 
         panelAoE = new JPanel();
-        panelAoE.setBorder(new TitledBorder(null, "Area of Interest", TitledBorder.LEADING,
+        panelAoE.setBorder(new TitledBorder(null, Translations.getString("ReferenceDragFeederConfigurationWizard.AreaOfInterestBorder.title"), TitledBorder.LEADING, //$NON-NLS-1$
                 TitledBorder.TOP, null, null));
         panelVisionTemplateAndAoe.add(panelAoE, "4, 2, fill, fill");
         panelAoE.setLayout(new FormLayout(
@@ -320,16 +321,16 @@ public class ReferenceDragFeederConfigurationWizard
                         FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
                         }));
 
-        lblX_1 = new JLabel("X");
+        lblX_1 = new JLabel(Translations.getString("CommonWords.X")); //$NON-NLS-1$
         panelAoE.add(lblX_1, "2, 2");
 
-        lblY_1 = new JLabel("Y");
+        lblY_1 = new JLabel(Translations.getString("CommonWords.Y")); //$NON-NLS-1$
         panelAoE.add(lblY_1, "4, 2");
 
-        lblWidth = new JLabel("Width");
+        lblWidth = new JLabel(Translations.getString("CommonWords.Width")); //$NON-NLS-1$
         panelAoE.add(lblWidth, "6, 2");
 
-        lblHeight = new JLabel("Height");
+        lblHeight = new JLabel(Translations.getString("CommonWords.Height")); //$NON-NLS-1$
         panelAoE.add(lblHeight, "8, 2");
 
         textFieldAoiX = new JTextField();

@@ -63,6 +63,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.openpnp.Translations;
 import org.openpnp.gui.components.AutoSelectTextTable;
+import org.openpnp.gui.components.ClassSelectionDialog;
 import org.openpnp.gui.support.AbstractConfigurationWizard;
 import org.openpnp.gui.support.ActionGroup;
 import org.openpnp.gui.support.Helpers;
@@ -119,7 +120,7 @@ public class PartsPanel extends JPanel implements WizardContainer {
         this.configuration = configuration;
         this.frame = frame;
 
-        singleSelectionActionGroup = new ActionGroup(deletePartAction, pickPartAction, copyPartToClipboardAction);
+        singleSelectionActionGroup = new ActionGroup(deletePartAction, pickPartAction, copyPartToClipboardAction, newFeederForPartAction);
         singleSelectionActionGroup.setEnabled(false);
         multiSelectionActionGroup = new ActionGroup(deletePartAction);
         multiSelectionActionGroup.setEnabled(false);
@@ -231,6 +232,11 @@ public class PartsPanel extends JPanel implements WizardContainer {
         JButton btnNewButton_1 = new JButton(pastePartToClipboardAction);
         btnNewButton_1.setHideActionText(true);
         toolBar.add(btnNewButton_1);
+
+        toolBar.addSeparator();
+        JButton btnNewFeederForPart = new JButton(newFeederForPartAction);
+        btnNewFeederForPart.setHideActionText(true);
+        toolBar.add(btnNewFeederForPart);
 
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -385,6 +391,44 @@ public class PartsPanel extends JPanel implements WizardContainer {
                 }
                 // Perform the whole Job like pick cycle as in the FeedersPanel. 
                 FeedersPanel.pickFeeder(feeder);
+            });
+        }
+    };
+
+    public final Action newFeederForPartAction = new AbstractAction() {
+        {
+            putValue(SMALL_ICON, Icons.feeder);
+            putValue(NAME, Translations.getString("PartsPanel.Action.NewFeederForPart")); //$NON-NLS-1$
+            putValue(SHORT_DESCRIPTION, Translations.getString("PartsPanel.Action.NewFeederForPart.Description")); //$NON-NLS-1$
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            Part part = getSelectedPart();
+            if (part == null) {
+                return;
+            }
+            if (Configuration.get().getParts().size() == 0) {
+                MessageBoxes.errorBox(getTopLevelAncestor(), "Error",
+                        "There are currently no parts defined in the system. Please create at least one part before creating a feeder.");
+                return;
+            }
+            String title = Translations.getString("FeedersPanel.SelectFeederImplementationDialog.SelectFor.title" //$NON-NLS-1$
+                    ) + " " + part.getId() + "..."; //$NON-NLS-1$ //$NON-NLS-2$
+            ClassSelectionDialog<Feeder> dialog =
+                    new ClassSelectionDialog<>(JOptionPane.getFrameForComponent(PartsPanel.this),
+                            title, Translations.getString(
+                                    "FeedersPanel.SelectFeederImplementationDialog.Description"), //$NON-NLS-1$
+                            configuration.getMachine().getCompatibleFeederClasses());
+            dialog.setVisible(true);
+            Class<? extends Feeder> feederClass = dialog.getSelectedClass();
+            if (feederClass == null) {
+                return;
+            }
+            MainFrame mainFrame = MainFrame.get();
+            mainFrame.getTabs().setSelectedComponent(mainFrame.getFeedersTab());
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                mainFrame.getFeedersTab().newFeeder(part, feederClass);
             });
         }
     };

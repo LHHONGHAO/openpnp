@@ -19,6 +19,8 @@
 
 package org.openpnp.gui;
 
+import java.io.File;
+
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -60,6 +62,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -368,6 +371,9 @@ public class MainFrame extends JFrame {
         mnFile.add(new JMenuItem(jobPanel.saveJobAsAction));
         mnFile.addSeparator();
         mnFile.add(new JMenuItem(saveConfigAction));
+        mnFile.addSeparator();
+        mnFile.add(new JMenuItem(exportConfigAction));
+        mnFile.add(new JMenuItem(importConfigAction));
 
 
         // File -> Import
@@ -1109,6 +1115,84 @@ public class MainFrame extends JFrame {
         return true;
     }
 
+    public void exportConfig() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle(Translations.getString("Menu.File.ExportConfiguration")); //$NON-NLS-1$
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File targetDir = chooser.getSelectedFile();
+            File configDir = configuration.getConfigurationDirectory();
+            try {
+                String[] configFiles = {"machine.xml", "packages.xml", "parts.xml", 
+                        "boards.xml", "panels.xml", "vision-settings.xml", "script-state.xml"};
+                int copied = 0;
+                for (String fileName : configFiles) {
+                    File src = new File(configDir, fileName);
+                    File dst = new File(targetDir, fileName);
+                    if (src.exists()) {
+                        java.nio.file.Files.copy(src.toPath(), dst.toPath(), 
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                        copied++;
+                    }
+                }
+                JOptionPane.showMessageDialog(this, 
+                        Translations.getString("Menu.File.ExportConfigurationSuccess") + " (" + copied + " files)", //$NON-NLS-1$ //$NON-NLS-2$
+                        Translations.getString("Menu.File.ExportConfiguration"), //$NON-NLS-1$
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+            catch (Exception e) {
+                MessageBoxes.errorBox(this, Translations.getString("Menu.File.ExportConfiguration"), e); //$NON-NLS-1$
+            }
+        }
+    }
+
+    public void importConfig() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle(Translations.getString("Menu.File.ImportConfiguration")); //$NON-NLS-1$
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File sourceDir = chooser.getSelectedFile();
+            int result = JOptionPane.showConfirmDialog(this, 
+                    Translations.getString("Menu.File.ImportConfigurationWarning"), //$NON-NLS-1$
+                    Translations.getString("Menu.File.ImportConfiguration"), //$NON-NLS-1$
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+            if (result != JOptionPane.OK_OPTION) {
+                return;
+            }
+            File configDir = configuration.getConfigurationDirectory();
+            try {
+                String[] configFiles = {"machine.xml", "packages.xml", "parts.xml", 
+                        "boards.xml", "panels.xml", "vision-settings.xml", "script-state.xml"};
+                int copied = 0;
+                for (String fileName : configFiles) {
+                    File src = new File(sourceDir, fileName);
+                    File dst = new File(configDir, fileName);
+                    if (src.exists()) {
+                        // Backup existing file
+                        if (dst.exists()) {
+                            java.nio.file.Files.copy(dst.toPath(), 
+                                    new File(configDir, fileName + ".bak").toPath(),
+                                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                        }
+                        java.nio.file.Files.copy(src.toPath(), dst.toPath(), 
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                        copied++;
+                    }
+                }
+                JOptionPane.showMessageDialog(this, 
+                        Translations.getString("Menu.File.ImportConfigurationSuccess") + " (" + copied + " files)", //$NON-NLS-1$ //$NON-NLS-2$
+                        Translations.getString("Menu.File.ImportConfiguration"), //$NON-NLS-1$
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+            catch (Exception e) {
+                MessageBoxes.errorBox(this, Translations.getString("Menu.File.ImportConfiguration"), e); //$NON-NLS-1$
+            }
+        }
+    }
+
     public boolean quit() {
         Logger.info("Shutting down..."); //$NON-NLS-1$
         try {
@@ -1300,6 +1384,20 @@ public class MainFrame extends JFrame {
         @Override
         public void actionPerformed(ActionEvent arg0) {
 			saveConfig();
+        }
+    };
+
+    private Action exportConfigAction = new AbstractAction(Translations.getString("Menu.File.ExportConfiguration")) { //$NON-NLS-1$
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            exportConfig();
+        }
+    };
+
+    private Action importConfigAction = new AbstractAction(Translations.getString("Menu.File.ImportConfiguration")) { //$NON-NLS-1$
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            importConfig();
         }
     };
 

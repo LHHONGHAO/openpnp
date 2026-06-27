@@ -497,7 +497,11 @@ public class FeedersPanel extends JPanel implements WizardContainer {
     @Override
     public void wizardCancelled(Wizard wizard) {}
 
-    private void newFeeder(Part part) {
+    public void newFeeder(Part part) {
+        newFeeder(part, null);
+    }
+
+    public void newFeeder(Part part, Class<? extends Feeder> preselectedFeederClass) {
         if (keepUnAppliedFeederConfigurationChanges()) {
             return;
         }
@@ -508,23 +512,26 @@ public class FeedersPanel extends JPanel implements WizardContainer {
             return;
         }
 
-        String title;
-        if (part == null) {
-            title = Translations.getString("FeedersPanel.SelectFeederImplementationDialog.Select.title"); //$NON-NLS-1$
-        }
-        else {
-            title = Translations.getString("FeedersPanel.SelectFeederImplementationDialog.SelectFor.title" //$NON-NLS-1$
-            ) + " " + part.getId() + "..."; //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        ClassSelectionDialog<Feeder> dialog =
-                new ClassSelectionDialog<>(JOptionPane.getFrameForComponent(FeedersPanel.this),
-                        title, Translations.getString(
-                                "FeedersPanel.SelectFeederImplementationDialog.Description"), //$NON-NLS-1$
-                        configuration.getMachine().getCompatibleFeederClasses());
-        dialog.setVisible(true);
-        Class<? extends Feeder> feederClass = dialog.getSelectedClass();
+        Class<? extends Feeder> feederClass = preselectedFeederClass;
         if (feederClass == null) {
-            return;
+            String title;
+            if (part == null) {
+                title = Translations.getString("FeedersPanel.SelectFeederImplementationDialog.Select.title"); //$NON-NLS-1$
+            }
+            else {
+                title = Translations.getString("FeedersPanel.SelectFeederImplementationDialog.SelectFor.title" //$NON-NLS-1$
+                ) + " " + part.getId() + "..."; //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            ClassSelectionDialog<Feeder> dialog =
+                    new ClassSelectionDialog<>(JOptionPane.getFrameForComponent(FeedersPanel.this),
+                            title, Translations.getString(
+                                    "FeedersPanel.SelectFeederImplementationDialog.Description"), //$NON-NLS-1$
+                            configuration.getMachine().getCompatibleFeederClasses());
+            dialog.setVisible(true);
+            feederClass = dialog.getSelectedClass();
+            if (feederClass == null) {
+                return;
+            }
         }
         try {
             priorFeederId = null;

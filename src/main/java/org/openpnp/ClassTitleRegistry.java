@@ -384,6 +384,25 @@ public class ClassTitleRegistry {
     }
 
     /**
+     * Get the display title for a Class, with PID prefix when mapping is enabled.
+     */
+    public static String getTitleForClass(Class<?> clazz) {
+        if (clazz == null) {
+            return "";
+        }
+        if (!isMappingEnabled()) {
+            return clazz.getSimpleName();
+        }
+        Mapping mapping = getMapping(clazz);
+        if (mapping == null) {
+            return clazz.getSimpleName();
+        }
+        String currentLanguage = Translations.getLanguage();
+        String title = "zh_CN".equals(currentLanguage) ? mapping.chineseTitle : mapping.englishTitle;
+        return "(PID:" + mapping.id.substring(3) + ") " + title;
+    }
+
+    /**
      * Convenience: get the untranslated default title for an object.
      */
     private static String getDefaultTitle(Object obj) {

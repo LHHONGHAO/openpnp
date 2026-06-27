@@ -156,16 +156,16 @@ public abstract class AbstractReferenceFeederConfigurationWizard
                             new RowSpec[] {FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
                                     FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,}));
 
-            lblX_1 = new JLabel("X");
+            lblX_1 = new JLabel(Translations.getString("AbstractReferenceFeederConfigurationWizard.PickLocationPanel.XLabel.text")); //$NON-NLS-1$
             panelLocation.add(lblX_1, "2, 2");
 
-            lblY_1 = new JLabel("Y");
+            lblY_1 = new JLabel(Translations.getString("AbstractReferenceFeederConfigurationWizard.PickLocationPanel.YLabel.text")); //$NON-NLS-1$
             panelLocation.add(lblY_1, "4, 2");
 
-            lblZ = new JLabel("Z");
+            lblZ = new JLabel(Translations.getString("AbstractReferenceFeederConfigurationWizard.PickLocationPanel.ZLabel.text")); //$NON-NLS-1$
             panelLocation.add(lblZ, "6, 2");
 
-            lblRotation = new JLabel("Rotation");
+            lblRotation = new JLabel(Translations.getString("AbstractReferenceFeederConfigurationWizard.PickLocationPanel.RotationLabel.text")); //$NON-NLS-1$
             panelLocation.add(lblRotation, "8, 2");
 
             textFieldLocationX = new JTextField();

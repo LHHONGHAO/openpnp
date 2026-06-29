@@ -20,8 +20,13 @@
 package org.openpnp.machine.reference.feeder.wizards;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +35,9 @@ import java.util.concurrent.Callable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -38,6 +46,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -55,6 +64,7 @@ import org.openpnp.gui.components.LocationButtonsPanel;
 import org.openpnp.gui.support.AbstractConfigurationWizard;
 import org.openpnp.gui.support.DoubleConverter;
 import org.openpnp.gui.support.Helpers;
+import org.openpnp.gui.support.Icons;
 import org.openpnp.gui.support.IdentifiableListCellRenderer;
 import org.openpnp.gui.support.IntegerConverter;
 import org.openpnp.gui.support.LengthConverter;
@@ -121,6 +131,7 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
     private JTextField textFieldMaxFeedCount;
     private JLabel lblRotationInTape;
     private JTextField textFieldLocationRotation;
+    private JLabel[] lblRotationDiagrams = new JLabel[4];
     private JButton btnAutoSetup;
     private JCheckBox chckbxUseVision;
     private JLabel lblUseVision;
@@ -201,6 +212,54 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
         textFieldLocationRotation = new JTextField();
         panelPart.add(textFieldLocationRotation, "4, 4, fill, default");
         textFieldLocationRotation.setColumns(10);
+
+        JPanel panelRotationDiagrams = new JPanel();
+        panelRotationDiagrams.setLayout(new FormLayout(new ColumnSpec[] {
+                FormSpecs.RELATED_GAP_COLSPEC,
+                FormSpecs.DEFAULT_COLSPEC,
+                FormSpecs.RELATED_GAP_COLSPEC,
+                FormSpecs.DEFAULT_COLSPEC,
+                FormSpecs.RELATED_GAP_COLSPEC,
+                FormSpecs.DEFAULT_COLSPEC,
+                FormSpecs.RELATED_GAP_COLSPEC,
+                FormSpecs.DEFAULT_COLSPEC,},
+            new RowSpec[] {
+                FormSpecs.RELATED_GAP_ROWSPEC,
+                FormSpecs.DEFAULT_ROWSPEC,
+                FormSpecs.RELATED_GAP_ROWSPEC,
+                FormSpecs.DEFAULT_ROWSPEC,}));
+
+        for (int i = 0; i < 4; i++) {
+            final int index = i;
+            Icon rotatedIcon = getRotatedIcon(Icons.tapeRotation, i * 90);
+            lblRotationDiagrams[i] = new JLabel(rotatedIcon);
+            lblRotationDiagrams[i].setOpaque(true);
+            lblRotationDiagrams[i].setBackground(Color.WHITE);
+            lblRotationDiagrams[i].setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+            lblRotationDiagrams[i].setToolTipText("-" + (90 * (i + 1)) + "°");
+            lblRotationDiagrams[i].addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    selectRotationDiagram(index);
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    lblRotationDiagrams[index].setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    if (!isDiagramSelected(index)) {
+                        lblRotationDiagrams[index].setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+                    }
+                }
+            });
+            int col = 2 + i * 2;
+            panelRotationDiagrams.add(lblRotationDiagrams[i], col + ", 2, center, center");
+        }
+
+        panelPart.add(panelRotationDiagrams, "6, 2, 3, 3, left, top");
 
         lblRetryCount = new JLabel(Translations.getString(
                 "ReferenceStripFeederConfigurationWizard.FeedRetryCountLabel.text")); //$NON-NLS-1$
@@ -529,6 +588,60 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
         else
         {
             lblPartInfo.setText("");
+        }
+    }
+
+    private Icon getRotatedIcon(Icon icon, int angle) {
+        int w = icon.getIconWidth();
+        int h = icon.getIconHeight();
+        double rad = Math.toRadians(angle);
+        double sin = Math.abs(Math.sin(rad));
+        double cos = Math.abs(Math.cos(rad));
+        int newW = (int) Math.floor(w * cos + h * sin);
+        int newH = (int) Math.floor(h * cos + w * sin);
+        BufferedImage original = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D og = original.createGraphics();
+        og.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        og.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        icon.paintIcon(new javax.swing.JLabel(), og, 0, 0);
+        og.dispose();
+        BufferedImage rotated = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = rotated.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        AffineTransform transform = new AffineTransform();
+        transform.translate((newW - w) / 2.0, (newH - h) / 2.0);
+        transform.rotate(rad, w / 2.0, h / 2.0);
+        g2.drawImage(original, transform, null);
+        g2.dispose();
+        return new ImageIcon(rotated);
+    }
+
+    private void selectRotationDiagram(int index) {
+        double angle = -90.0 * (index + 1);
+        textFieldLocationRotation.setText(String.format(Locale.US, "%.1f", angle));
+        updateDiagramSelectionBorder();
+    }
+
+    private boolean isDiagramSelected(int index) {
+        double angle = -90.0 * (index + 1);
+        try {
+            double current = Double.parseDouble(textFieldLocationRotation.getText().trim());
+            return Math.abs(current - angle) < 0.1;
+        }
+        catch (NumberFormatException ex) {
+            return false;
+        }
+    }
+
+    private void updateDiagramSelectionBorder() {
+        for (int i = 0; i < 4; i++) {
+            if (isDiagramSelected(i)) {
+                lblRotationDiagrams[i].setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
+            }
+            else {
+                lblRotationDiagrams[i].setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+            }
         }
     }
     

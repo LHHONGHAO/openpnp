@@ -20,13 +20,10 @@
 package org.openpnp.machine.reference.feeder.wizards;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +34,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -46,7 +42,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -229,12 +224,13 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
                 FormSpecs.RELATED_GAP_ROWSPEC,
                 FormSpecs.DEFAULT_ROWSPEC,}));
 
+        Icon[] rotationIcons = { Icons.tapeRot0, Icons.tapeRot90, Icons.tapeRot180, Icons.tapeRot270 };
+
         for (int i = 0; i < 4; i++) {
             final int index = i;
-            Icon rotatedIcon = getRotatedIcon(Icons.tapeRotation, i * 90);
-            lblRotationDiagrams[i] = new JLabel(rotatedIcon);
+            lblRotationDiagrams[i] = new JLabel(rotationIcons[i]);
             lblRotationDiagrams[i].setOpaque(true);
-            lblRotationDiagrams[i].setBackground(Color.WHITE);
+            lblRotationDiagrams[i].setBackground(new Color(26, 26, 26));
             lblRotationDiagrams[i].setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
             lblRotationDiagrams[i].setToolTipText("-" + (90 * (i + 1)) + "°");
             lblRotationDiagrams[i].addMouseListener(new MouseAdapter() {
@@ -589,32 +585,6 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
         {
             lblPartInfo.setText("");
         }
-    }
-
-    private Icon getRotatedIcon(Icon icon, int angle) {
-        int w = icon.getIconWidth();
-        int h = icon.getIconHeight();
-        double rad = Math.toRadians(angle);
-        double sin = Math.abs(Math.sin(rad));
-        double cos = Math.abs(Math.cos(rad));
-        int newW = (int) Math.floor(w * cos + h * sin);
-        int newH = (int) Math.floor(h * cos + w * sin);
-        BufferedImage original = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D og = original.createGraphics();
-        og.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        og.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        icon.paintIcon(new javax.swing.JLabel(), og, 0, 0);
-        og.dispose();
-        BufferedImage rotated = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = rotated.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        AffineTransform transform = new AffineTransform();
-        transform.translate((newW - w) / 2.0, (newH - h) / 2.0);
-        transform.rotate(rad, w / 2.0, h / 2.0);
-        g2.drawImage(original, transform, null);
-        g2.dispose();
-        return new ImageIcon(rotated);
     }
 
     private void selectRotationDiagram(int index) {

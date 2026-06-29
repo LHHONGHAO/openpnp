@@ -62,7 +62,10 @@ public class Icons {
     public static Icon showPart = getIcon("/icons/feeder-show-part-outline.svg");
     public static Icon editFeeder = getIcon("/icons/feeder-edit.svg");
     public static Icon feeder = getIcon("/icons/feeder.svg");
-    public static Icon tapeRotation = getIcon("/icons/tape-rotation.svg", 100, 67);
+    public static Icon tapeRot0 = getIcon("/icons/tape-rot-0.svg", 50, 50);
+    public static Icon tapeRot90 = getIcon("/icons/tape-rot-90.svg", 50, 50);
+    public static Icon tapeRot180 = getIcon("/icons/tape-rot-180.svg", 50, 50);
+    public static Icon tapeRot270 = getIcon("/icons/tape-rot-270.svg", 50, 50);
 
     public static Icon partAlign = getIcon("/icons/part-align.svg");
 

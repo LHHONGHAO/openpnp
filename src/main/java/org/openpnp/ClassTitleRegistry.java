@@ -71,7 +71,7 @@ public class ClassTitleRegistry {
     private static final String TEXT_PATTERNS_RESOURCE = "text-mapping-patterns.properties";
 
     public static boolean isMappingEnabled() {
-        return prefs.getBoolean(PREF_MAPPING_ENABLED, false);
+        return prefs.getBoolean(PREF_MAPPING_ENABLED, true);
     }
 
     public static void setMappingEnabled(boolean enabled) {

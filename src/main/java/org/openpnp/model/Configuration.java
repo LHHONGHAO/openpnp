@@ -73,10 +73,10 @@ public class Configuration extends AbstractModelObject {
     private static Configuration instance;
 
     private static final String PREF_LOCALE_LANG = "Configuration.locale.lang";
-    private static final String PREF_LOCALE_LANG_DEF = "en";
+    private static final String PREF_LOCALE_LANG_DEF = "zh";
 
     private static final String PREF_LOCALE_COUNTRY = "Configuration.locale.country";
-    private static final String PREF_LOCALE_COUNTRY_DEF = "US";
+    private static final String PREF_LOCALE_COUNTRY_DEF = "CN";
 
     private static final String PREF_UNITS = "Configuration.units";
     private static final String PREF_UNITS_DEF = "Millimeters";

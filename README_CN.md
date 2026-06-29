@@ -44,13 +44,43 @@ mvn -version
 https://gitee.com/lhhonghao/openpnp-maven-repo/raw/develop
 ```
 
-## 项目构建
+## 快速开始（推荐）
+
+### 一键构建并运行（Windows）
+
+项目提供了两个一键脚本，自动完成编译和启动：
+
+**开发模式（编译后直接运行）：**
+```bash
+build-and-run.bat
+```
+此脚本会自动：
+1. 检测 Maven 环境
+2. 编译项目（跳过测试）
+3. 复制资源文件
+4. 启动 OpenPnP
+
+**发布模式（打包可执行 JAR 后运行）：**
+```bash
+build-and-run-exec.bat
+```
+此脚本会自动：
+1. 检测 Maven 环境
+2. 执行 `mvn package -DskipTests`
+3. 生成独立可执行 JAR 文件
+4. 启动 OpenPnP
+
+> 首次运行后将生成 `target/openpnp-gui-0.0.1-alpha-SNAPSHOT-exec.jar`（约 180MB），可复制到其他电脑独立运行。
+
+---
+
+## 分离式构建与运行
 
 ### 1. 编译项目
 
 ```bash
 cd openpnp
-mvn clean compile
+mvn clean compile -DskipTests
 ```
 
 ### 2. 打包项目
@@ -59,25 +89,72 @@ mvn clean compile
 mvn clean package -DskipTests
 ```
 
-打包完成后，会在 `target` 目录下生成可执行的 JAR 文件：
-```
-openpnp-gui-0.0.1-alpha-SNAPSHOT.jar
-```
+打包完成后，会在 `target` 目录下生成：
+- `openpnp-gui-0.0.1-alpha-SNAPSHOT.jar` — 普通 jar（需配合 lib/ 目录运行）
+- `openpnp-gui-0.0.1-alpha-SNAPSHOT-exec.jar` — 独立可执行 jar（包含所有依赖）
 
-## 运行项目
-
-### 方法一：使用批处理脚本（Windows）
-
-在项目根目录下运行：
-```bash
-openpnp.bat
-```
-
-### 方法二：使用 Java 直接运行 JAR 文件
+### 方法一：使用批处理脚本运行
 
 ```bash
-java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.desktop/java.awt=ALL-UNNAMED --add-opens=java.desktop/java.awt.color=ALL-UNNAMED -jar target\openpnp-gui-0.0.1-alpha-SNAPSHOT.jar
+run.bat          # 开发模式运行 (需要先编译)
+run-exec.bat     # 独立jar运行 (需要先打包)
 ```
+
+### 方法二：使用 Java 直接运行
+
+**开发模式（编译后）：**
+```bash
+java --add-opens=java.base/java.lang=ALL-UNNAMED ^
+     --add-opens=java.desktop/java.awt=ALL-UNNAMED ^
+     --add-opens=java.desktop/java.awt.color=ALL-UNNAMED ^
+     --add-opens=java.base/java.io=ALL-UNNAMED ^
+     --add-opens=java.base/java.util=ALL-UNNAMED ^
+     --add-opens=java.desktop/javax.swing=ALL-UNNAMED ^
+     --add-opens=java.desktop/java.awt.event=ALL-UNNAMED ^
+     -cp "target/classes;target/lib/*" ^
+     org.openpnp.Main
+```
+
+**独立 JAR 模式（打包后）：**
+```bash
+java --add-opens=java.base/java.lang=ALL-UNNAMED ^
+     --add-opens=java.desktop/java.awt=ALL-UNNAMED ^
+     --add-opens=java.desktop/java.awt.color=ALL-UNNAMED ^
+     --add-opens=java.base/java.io=ALL-UNNAMED ^
+     --add-opens=java.base/java.util=ALL-UNNAMED ^
+     --add-opens=java.desktop/javax.swing=ALL-UNNAMED ^
+     --add-opens=java.desktop/java.awt.event=ALL-UNNAMED ^
+     -jar target\openpnp-gui-0.0.1-alpha-SNAPSHOT-exec.jar
+```
+
+---
+
+## 文本映射功能（重要）
+
+本项目实现了类名和界面文本的中文显示映射功能，可以将飞达类型、机器组件等以中文名称显示。
+
+### 启用文本映射
+
+文本映射功能**默认关闭**。首次运行后，请按以下步骤启用：
+
+1. 打开菜单栏：**帮助(Help) → 类标题映射编辑器(Class Title Mapping Editor)**
+2. 在打开的对话框中，**勾选左上角的复选框**以启用映射
+3. 如果界面未自动切换为中文，在对话框中选择 **"Chinese (Simplified)"** 并点击 **"设置语言"**
+4. 关闭对话框
+
+启用后，以下界面将以中文显示：
+- 飞达类型选择对话框（条状送料器、托盘送料器、拖拽送料器等）
+- 飞达配置向导页面标题
+- 机器配置界面的组件名称
+- 问题与解决方案的描述
+
+### 注意事项
+
+- **每台新电脑首次启动后都需要手动启用映射**
+- 映射设置保存在 Java Preferences 中（用户级配置，每台电脑独立）
+- 如果界面显示为英文而未切换中文，请检查映射是否已启用
+
+---
 
 ## 配置文件
 
@@ -112,17 +189,30 @@ git push origin main
 
 ## 常见问题
 
-### 1. 依赖下载失败
+### 1. 另一台电脑运行功能不一致/文本映射不生效
+
+**原因：文本映射默认关闭，每台新电脑需要手动启用。**
+
+解决方法：
+1. 启动 OpenPnP 后，点击菜单栏 **帮助(Help) → 类标题映射编辑器(Class Title Mapping Editor)**
+2. **勾选左上角的复选框**以启用映射
+3. 选择 **"Chinese (Simplified)"** 并点击 **"设置语言"**
+
+### 2. 依赖下载失败
 
 如果 Maven 依赖下载失败，请检查网络连接或尝试更换 Maven 镜像源。
 
-### 2. Java 版本不兼容
+### 3. Java 版本不兼容
 
-请确保使用 Java 11 或更高版本。如果您使用的是较新版本的 Java，可能需要添加额外的 JVM 参数。
+请确保使用 Java 17 或更高版本。如果使用较新版本的 Java，需要添加 `--add-opens` 参数（`build-and-run.bat` 已自动添加）。
 
-### 3. UI 界面无法显示
+### 4. UI 界面无法显示
 
 确保您的系统支持图形化界面，并且已正确配置 Java 环境。
+
+### 5. 编译后无法运行
+
+请确保先运行过 `mvn compile -DskipTests` 或 `mvn package -DskipTests`。推荐使用 `build-and-run.bat` 一键脚本。
 
 ## 更多信息
 

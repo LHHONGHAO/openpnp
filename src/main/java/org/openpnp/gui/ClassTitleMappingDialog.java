@@ -217,13 +217,27 @@ public class ClassTitleMappingDialog extends JDialog {
 
         for (Mapping mapping : allMappings) {
             boolean matches = false;
-            if (mapping.id.toLowerCase().contains(searchText)) matches = true;
-            if (!matches && mapping.source.toLowerCase().contains(searchText)) matches = true;
-            if (!matches && mapping.englishTitle.toLowerCase().contains(searchText)) matches = true;
-            if (!matches && mapping.chineseTitle.contains(searchText)) matches = true;
-            if (!matches && mapping.category.toLowerCase().contains(searchText)) matches = true;
-            if (!matches && mapping.type.name().toLowerCase().contains(searchText)) matches = true;
-            if (!matches && mapping.simpleName != null && mapping.simpleName.toLowerCase().contains(searchText)) matches = true;
+            if (mapping.id.toLowerCase().contains(searchText)) {
+                matches = true;
+            }
+            if (!matches && mapping.source.toLowerCase().contains(searchText)) {
+                matches = true;
+            }
+            if (!matches && mapping.englishTitle.toLowerCase().contains(searchText)) {
+                matches = true;
+            }
+            if (!matches && mapping.chineseTitle.contains(searchText)) {
+                matches = true;
+            }
+            if (!matches && mapping.category.toLowerCase().contains(searchText)) {
+                matches = true;
+            }
+            if (!matches && mapping.type.name().toLowerCase().contains(searchText)) {
+                matches = true;
+            }
+            if (!matches && mapping.simpleName != null && mapping.simpleName.toLowerCase().contains(searchText)) {
+                matches = true;
+            }
             
             if (matches) {
                 filteredMappings.add(mapping);

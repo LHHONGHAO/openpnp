@@ -152,14 +152,20 @@ public class ClassTitleRegistry {
     }
 
     private static void loadClassMappingsFromStream(java.io.InputStream is, boolean isOverride) {
-        if (is == null) return;
+        if (is == null) {
+            return;
+        }
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
-                if (line.isEmpty() || line.startsWith("#")) continue;
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
                 String[] parts = line.split("\\|", 8);
-                if (parts.length < 7) continue;
+                if (parts.length < 7) {
+                    continue;
+                }
                 String pid = "ID_" + parts[0];
                 String className = parts[1];
                 String simpleName = parts[2];
@@ -195,14 +201,20 @@ public class ClassTitleRegistry {
     }
 
     private static void loadTextMappingsFromStream(java.io.InputStream is) {
-        if (is == null) return;
+        if (is == null) {
+            return;
+        }
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
-                if (line.isEmpty() || line.startsWith("#")) continue;
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
                 String[] parts = line.split("\\|", 4);
-                if (parts.length < 4) continue;
+                if (parts.length < 4) {
+                    continue;
+                }
                 String pid = "ID_" + parts[0];
                 String originalText = parts[1];
                 String englishTranslation = parts[2];
@@ -221,14 +233,20 @@ public class ClassTitleRegistry {
     }
 
     private static void loadPatternsFromStream(java.io.InputStream is) {
-        if (is == null) return;
+        if (is == null) {
+            return;
+        }
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
-                if (line.isEmpty() || line.startsWith("#")) continue;
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
                 String[] parts = line.split("\\|", 4);
-                if (parts.length < 4) continue;
+                if (parts.length < 4) {
+                    continue;
+                }
                 String pid = "ID_" + parts[0];
                 String regex = parts[1];
                 String englishTemplate = parts[2];

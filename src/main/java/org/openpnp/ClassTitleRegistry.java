@@ -58,6 +58,7 @@ public class ClassTitleRegistry {
     private static final Map<String, Mapping> mappingsBySource = new HashMap<>();
     private static final Map<String, Mapping> mappingsByClassName = new HashMap<>();
     private static final Map<String, Mapping> mappingsBySimpleName = new HashMap<>();
+    private static final Map<String, String> textMappingCache = new HashMap<>();
     private static final Preferences prefs = Preferences.userNodeForPackage(ClassTitleRegistry.class);
 
     private static final String PREF_MAPPING_ENABLED = "mappingEnabled";
@@ -97,6 +98,7 @@ public class ClassTitleRegistry {
         mappingsBySource.clear();
         mappingsByClassName.clear();
         mappingsBySimpleName.clear();
+        textMappingCache.clear();
 
         loadClasspathDefaults();
         loadUserOverrides();
@@ -451,11 +453,17 @@ public class ClassTitleRegistry {
         if (!isMappingEnabled()) {
             return text;
         }
+        String cached = textMappingCache.get(text);
+        if (cached != null) {
+            return cached;
+        }
         Mapping mapping = getTextMappingByText(text);
         if (mapping != null) {
             String currentLanguage = Translations.getLanguage();
             String translatedText = "zh_CN".equals(currentLanguage) ? mapping.chineseTitle : mapping.englishTitle;
-            return "(PID:" + mapping.id.substring(3) + ") " + translatedText;
+            String result = "(PID:" + mapping.id.substring(3) + ") " + translatedText;
+            textMappingCache.put(text, result);
+            return result;
         }
         for (Mapping patternMapping : allMappings) {
             if (patternMapping.type == MappingType.PATTERN && patternMapping.pattern != null) {
@@ -468,10 +476,13 @@ public class ClassTitleRegistry {
                         String varPart = matcher.group(i + 1);
                         result = result.replace("{" + i + "}", varPart);
                     }
-                    return "(PID:" + patternMapping.id.substring(3) + ") " + result;
+                    result = "(PID:" + patternMapping.id.substring(3) + ") " + result;
+                    textMappingCache.put(text, result);
+                    return result;
                 }
             }
         }
+        textMappingCache.put(text, text);
         return text;
     }
 

@@ -19,7 +19,9 @@
 
 package org.openpnp.machine.reference.feeder.wizards;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -33,6 +35,9 @@ import java.util.concurrent.Callable;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -40,6 +45,8 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
@@ -140,6 +147,10 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
     private JLabel lblParallaxAngle;
     private JTextField parallaxAngle;
     private JComboBox comboBoxFeedOptions;
+
+    private ButtonGroup commonPartsGroup = new ButtonGroup();
+    private JPanel panelCommonParts;
+    private int commonPartsIndex = 0;
 
     private boolean logDebugInfo = false;
     private Location firstPartLocation;
@@ -280,10 +291,83 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
         panelTapeSettings.setBorder(new TitledBorder(null,
                 Translations.getString("ReferenceStripFeederConfigurationWizard.PanelTapeSettings.Border.title"), //$NON-NLS-1$
                 TitledBorder.LEADING, TitledBorder.TOP, null));
-        panelTapeSettings.setLayout(new FormLayout(
+        panelTapeSettings.setLayout(new BorderLayout());
+
+        btnAutoSetup = new JButton(autoSetup);
+
+        JButton btnAddCommonPart = new JButton("+ 添加常用元件");
+        btnAddCommonPart.addActionListener(e -> {
+            JTextField nameField = new JTextField(15);
+            JTextField pitchField = new JTextField(8);
+            JTextField widthField = new JTextField(8);
+
+            JPanel dialogPanel = new JPanel();
+            dialogPanel.setLayout(new FormLayout(
+                    new ColumnSpec[] {FormSpecs.RELATED_GAP_COLSPEC,
+                            FormSpecs.DEFAULT_COLSPEC,
+                            FormSpecs.RELATED_GAP_COLSPEC,
+                            FormSpecs.DEFAULT_COLSPEC,},
+                    new RowSpec[] {FormSpecs.RELATED_GAP_ROWSPEC,
+                            FormSpecs.DEFAULT_ROWSPEC,
+                            FormSpecs.RELATED_GAP_ROWSPEC,
+                            FormSpecs.DEFAULT_ROWSPEC,
+                            FormSpecs.RELATED_GAP_ROWSPEC,
+                            FormSpecs.DEFAULT_ROWSPEC,}));
+            dialogPanel.add(new JLabel("元件名称:"), "2, 2, right, default");
+            dialogPanel.add(nameField, "4, 2");
+            dialogPanel.add(new JLabel("元件间距:"), "2, 4, right, default");
+            dialogPanel.add(pitchField, "4, 4");
+            dialogPanel.add(new JLabel("料带宽度:"), "2, 6, right, default");
+            dialogPanel.add(widthField, "4, 6");
+
+            int result = javax.swing.JOptionPane.showConfirmDialog(
+                    SwingUtilities.getWindowAncestor(panelTapeSettings),
+                    dialogPanel,
+                    "添加常用元件",
+                    javax.swing.JOptionPane.OK_CANCEL_OPTION,
+                    javax.swing.JOptionPane.PLAIN_MESSAGE);
+
+            if (result == javax.swing.JOptionPane.OK_OPTION) {
+                String name = nameField.getText().trim();
+                if (name.isEmpty()) {
+                    return;
+                }
+                try {
+                    double pitch = Double.parseDouble(pitchField.getText().trim());
+                    double width = Double.parseDouble(widthField.getText().trim());
+                    CommonPartSpec spec = new CommonPartSpec(name, pitch, width);
+                    JRadioButton rb = new JRadioButton(name);
+                    rb.addActionListener(ev -> {
+                        textFieldPartPitch.setText(String.valueOf(spec.partPitch));
+                        textFieldTapeWidth.setText(String.valueOf(spec.tapeWidth));
+                    });
+                    commonPartsGroup.add(rb);
+                    panelCommonParts.add(rb);
+                    panelCommonParts.revalidate();
+                    panelCommonParts.repaint();
+                } catch (NumberFormatException ex) {
+                    javax.swing.JOptionPane.showMessageDialog(
+                            SwingUtilities.getWindowAncestor(panelTapeSettings),
+                            "请输入有效的数值",
+                            "错误",
+                            javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        JPanel panelTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        panelTop.add(btnAutoSetup);
+        panelTop.add(Box.createRigidArea(new Dimension(30, 0)));
+        panelTop.add(btnAddCommonPart);
+        panelTapeSettings.add(panelTop, BorderLayout.NORTH);
+
+        JPanel panelColumns = new JPanel(new java.awt.GridLayout(1, 2, 10, 0));
+        panelTapeSettings.add(panelColumns, BorderLayout.CENTER);
+
+        // ===== 左列：参数区域 =====
+        JPanel panelLeft = new JPanel(new BorderLayout());
+        JPanel panelLeftForm = new JPanel(new FormLayout(
                 new ColumnSpec[] {FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC,
-                        FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC,
-                        FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC,
                         FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC,
                         FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC,
                         FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC,},
@@ -292,33 +376,31 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
                         FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
                         FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,
                         FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC,}));
-
-        btnAutoSetup = new JButton(autoSetup);
-        panelTapeSettings.add(btnAutoSetup, "2, 2, 11, 1");
-
-        JLabel lblTapeWidth = new JLabel(Translations.getString(
-                "ReferenceStripFeederConfigurationWizard.TapeWidthLabel.text")); //$NON-NLS-1$
-        panelTapeSettings.add(lblTapeWidth, "8, 4, right, default");
-
-        textFieldTapeWidth = new JTextField();
-        panelTapeSettings.add(textFieldTapeWidth, "10, 4");
-        textFieldTapeWidth.setColumns(5);
+        panelColumns.add(panelLeft);
 
         lblPartPitch = new JLabel(Translations.getString(
                 "ReferenceStripFeederConfigurationWizard.PartPitchLabel.text")); //$NON-NLS-1$
-        panelTapeSettings.add(lblPartPitch, "2, 4, right, default");
+        panelLeftForm.add(lblPartPitch, "2, 2, right, default");
 
         textFieldPartPitch = new JTextField();
-        panelTapeSettings.add(textFieldPartPitch, "4, 4");
+        panelLeftForm.add(textFieldPartPitch, "4, 2");
         textFieldPartPitch.setColumns(5);
+
+        JLabel lblTapeWidth = new JLabel(Translations.getString(
+                "ReferenceStripFeederConfigurationWizard.TapeWidthLabel.text")); //$NON-NLS-1$
+        panelLeftForm.add(lblTapeWidth, "2, 4, right, default");
+
+        textFieldTapeWidth = new JTextField();
+        panelLeftForm.add(textFieldTapeWidth, "4, 4");
+        textFieldTapeWidth.setColumns(5);
 
         lblFeedCount = new JLabel(Translations.getString(
                 "ReferenceStripFeederConfigurationWizard.FeedCountLabel.text")); //$NON-NLS-1$
-        panelTapeSettings.add(lblFeedCount, "8, 6, right, default");
+        panelLeftForm.add(lblFeedCount, "2, 6, right, default");
 
         textFieldFeedCount = new JTextField();
-        panelTapeSettings.add(textFieldFeedCount, "10, 6");
-        textFieldFeedCount.setColumns(10);
+        panelLeftForm.add(textFieldFeedCount, "4, 6");
+        textFieldFeedCount.setColumns(5);
 
         btnResetFeedCount = new JButton(new AbstractAction(Translations.getString(
                 "ReferenceStripFeederConfigurationWizard.ResetFeedCountButton.text")) { //$NON-NLS-1$
@@ -330,14 +412,14 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
         });
         btnResetFeedCount.setToolTipText(Translations.getString(
                 "ReferenceStripFeederConfigurationWizard.ResetFeedCountButton.toolTipText")); //$NON-NLS-1$
-        panelTapeSettings.add(btnResetFeedCount, "12, 6");
+        panelLeftForm.add(btnResetFeedCount, "6, 6");
 
         lblMaxFeedCount = new JLabel(Translations.getString(
                 "ReferenceStripFeederConfigurationWizard.MaxFeedCountLabel.text")); //$NON-NLS-1$
-        panelTapeSettings.add(lblMaxFeedCount,"8, 8, right, default");
+        panelLeftForm.add(lblMaxFeedCount,"2, 8, right, default");
         textFieldMaxFeedCount = new JTextField();
-        panelTapeSettings.add(textFieldMaxFeedCount,"10,8");
-        textFieldMaxFeedCount.setColumns(10);
+        panelLeftForm.add(textFieldMaxFeedCount,"4, 8");
+        textFieldMaxFeedCount.setColumns(5);
         textFieldMaxFeedCount.setToolTipText(Translations.getString(
                 "ReferenceStripFeederConfigurationWizard.MaxFeedCountTextField.toolTipText")); //$NON-NLS-1$
         btnMaxFeedCount = new JButton(new AbstractAction(Translations.getString(
@@ -354,7 +436,29 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
         });
         btnMaxFeedCount.setToolTipText(Translations.getString(
                 "ReferenceStripFeederConfigurationWizard.AutoSetMaxFeedCountButton.toolTipText")); //$NON-NLS-1$
-        panelTapeSettings.add(btnMaxFeedCount,"12,8");
+        panelLeftForm.add(btnMaxFeedCount,"6, 8");
+
+        panelLeft.add(panelLeftForm, BorderLayout.NORTH);
+
+        // 对齐：autoSetup 右边对齐 reset 按钮右边
+        btnAutoSetup.setPreferredSize(new Dimension(
+                btnResetFeedCount.getPreferredSize().width, 
+                btnAutoSetup.getPreferredSize().height));
+
+        // ===== 右列：常用元件区域 =====
+        JPanel panelRight = new JPanel(new BorderLayout());
+
+        panelCommonParts = new JPanel();
+        panelCommonParts.setLayout(new BoxLayout(panelCommonParts, BoxLayout.Y_AXIS));
+        JScrollPane commonPartsScrollPane = new JScrollPane(panelCommonParts);
+        commonPartsScrollPane.setPreferredSize(new Dimension(140, 120));
+        commonPartsScrollPane.setBorder(null);
+        // 选择框左边对齐添加按钮左边
+        panelRight.setBorder(BorderFactory.createEmptyBorder(0, 
+                btnAutoSetup.getPreferredSize().width + 30, 0, 0));
+        panelRight.add(commonPartsScrollPane, BorderLayout.CENTER);
+
+        panelColumns.add(panelRight);
         
         JPanel panelVision = new JPanel();
         panelVision.setBorder(new TitledBorder(null, Translations.getString(
@@ -1183,5 +1287,22 @@ public class ReferenceStripFeederConfigurationWizard extends AbstractConfigurati
 
     private void clearVisionCache() {
         feeder.resetVision();
+    }
+
+    private static class CommonPartSpec {
+        final String name;
+        final double partPitch;
+        final double tapeWidth;
+
+        CommonPartSpec(String name, double partPitch, double tapeWidth) {
+            this.name = name;
+            this.partPitch = partPitch;
+            this.tapeWidth = tapeWidth;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }

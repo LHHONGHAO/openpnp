@@ -421,10 +421,22 @@ public class IssuesAndSolutionsPanel extends JPanel {
     protected void notifySolutionsChanged() {
         if (dirty) {
             dirty = false;
-            // Reselect the Machine Setup tree path to reload the wizard with potentially different settings and property sheets.
-            // Otherwise each and every modified setting would need property change firing support, which is clearly not the case.
-            MainFrame.get().getMachineSetupTab().selectCurrentTreePath();
-            selectionActions();
+            if (notifyCount < MAX_NOTIFY_COUNT) {
+                notifyCount++;
+                // Reselect the Machine Setup tree path to reload the wizard with potentially different settings and property sheets.
+                // Otherwise each and every modified setting would need property change firing support, which is clearly not the case.
+                MainFrame.get().getMachineSetupTab().selectCurrentTreePath();
+                selectionActions();
+                if (notifyCount == MAX_NOTIFY_COUNT - 1) {
+                    // Start a timer to reset the counter after a delay
+                    new javax.swing.Timer(2000, e -> {
+                        notifyCount = 0;
+                    }) {{
+                        setRepeats(false);
+                        start();
+                    }};
+                }
+            }
             dirty = false;
         }
     }
@@ -555,6 +567,8 @@ public class IssuesAndSolutionsPanel extends JPanel {
     private JCheckBox showSolved;
     private JCheckBox showDismissed;
     private boolean dirty = false;
+    private int notifyCount = 0;
+    private static final int MAX_NOTIFY_COUNT = 5;
 
     protected void initDataBindings() {
         BeanProperty<Solutions, String> solutionsBeanProperty = BeanProperty.create("targetMilestone.name");
